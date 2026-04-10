@@ -43,6 +43,67 @@
     display: none !important;
 }
 
+/* Competitive Programming Compiler Style */
+#judge0-site-navigation {
+    background: #1e1e1e !important;
+    border-bottom: 1px solid #333 !important;
+    padding: 4px 12px !important;
+    min-height: 40px !important;
+}
+
+#judge0-site-navigation .item {
+    padding: 4px 8px !important;
+}
+
+#judge0-site-navigation .ui.primary.button {
+    background: #0e7c4a !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+}
+
+#judge0-site-navigation .ui.primary.button:hover {
+    background: #109e5c !important;
+}
+
+#select-language {
+    min-width: 160px !important;
+    background: #2d2d2d !important;
+    color: #ddd !important;
+    border: 1px solid #444 !important;
+}
+
+body {
+    background: #1e1e1e !important;
+    background-image: none !important;
+}
+
+#judge0-site-content {
+    background: #1e1e1e !important;
+}
+
+/* Editor panel */
+.lm_content {
+    background: #1e1e1e !important;
+}
+
+/* Panel headers */
+.lm_header {
+    background: #252526 !important;
+}
+
+/* Make output and input more compact */
+.lm_splits .lm_stack {
+    border: none !important;
+}
+
+#judge0-status-line {
+    background: #007acc !important;
+    color: white !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+}
+
 @media (display-mode: standalone) {
     .judge0-standalone-hidden {
         display: none !important;

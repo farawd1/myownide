@@ -52,8 +52,8 @@
     <link type="text/css" rel="stylesheet" href="css/semantic.css">
     <link type="text/css" rel="stylesheet" href="css/site.css">
 
-    <title>Judge0 IDE</title>
-    <meta name="title" content="Judge0 IDE">
+    <title>Online Compiler</title>
+    <meta name="title" content="Online Compiler">
     <meta name="description" content="Free and open-source online code editor and compiler">
     <meta name="author" content="Judge0 d.o.o.">
     <meta name="keywords" content="online editor, online code editor, online ide, online compiler, online interpreter, run code online, learn programming online,
@@ -92,69 +92,18 @@
 
 <body>
     <div id="judge0-site-navigation" class="ui top fixed borderless menu judge0-showNavigation">
-        <a id="judge0-header" href="https://judge0.com" target="_blank" class="header item judge0-showLogo">
-            <img id="judge0-logo" src="./images/icon_var2_rounded_512.png">
-        </a>
-        <div class="ui simple dropdown item judge0-showFileMenu">
-            <span class="text">File</span>
-            <i class="dropdown icon"></i>
-            <div class="menu judge0-file-menu">
-                <div id="judge0-open-file-btn" class="item">
-                    <span class="description">+O</span>
-                    <span class="text"><i class="file icon"></i>Open File...</span>
-                    <input type="file" id="open-file-input" style="display: none;">
-                </div>
-                <div id="judge0-save-btn" class="item">
-                    <span class="description">+S</span>
-                    <span class="text"><i class="save icon"></i>Save</span>
-                </div>
-            </div>
-        </div>
-        <div class="ui simple dropdown item judge0-showHelpMenu">
-            <span class="text">Help</span>
-            <i class="dropdown icon"></i>
-            <div class="menu judge0-file-menu">
-                <a href="https://github.com/judge0/ide" class="link text item" target="_blank"><i class="external square alternate icon"></i>GitHub Repository</a>
-                <a href="/embed" class="link text item" target="_blank"><i class="external square alternate icon"></i>Embed Guide</a>
-                <a href="https://platform.sulu.sh/apis/judge0" class="link text item" target="_blank"><i class="external square alternate icon"></i>HTTP API Documentation</a>
-                <a href="PRIVACY.md" class="link text item" target="_blank"><i class="external square alternate icon"></i>Privacy Policy</a>
-                <a href="TERMS.md" class="link text item" target="_blank"><i class="external square alternate icon"></i>Terms of Service</a>
-            </div>
-        </div>
         <div class="item judge0-showSelectLanguage">
             <select id="select-language" class="ui search selection dropdown"></select>
-        </div>
-        <div class="item judge0-showCompilerOptions">
-            <div class="ui left icon transparent input">
-                <i class="flag icon"></i>
-                <input id="compiler-options" type="text" placeholder="Compiler options"></input>
-            </div>
-        </div>
-        <div class="item judge0-showCommandLineArguments">
-            <div class="ui left icon transparent input">
-                <i class="terminal icon"></i>
-                <input id="command-line-arguments" type="text" placeholder="Command line arguments"></input>
-            </div>
         </div>
         <div class="item judge0-showRunButton">
             <button id="run-btn" class="ui primary labeled icon button" data-content="+↵">
                 <i class="play icon"></i>
-                Run Code
+                Run
             </button>
         </div>
         <div class="right menu">
-            <div id="judge0-theme-toggle-btn" class="icon link item judge0-showThemeButton" data-content="">
-                <i id="judge0-theme-toggle-btn-icon" class="sun icon"></i>
-            </div>
-            <div class="item judge0-showPuterSignInOutButton">
-                <button id="judge0-sign-in-btn" class="ui basic button">
-                    <i class="sign-in icon"></i>
-                    Sign in with Puter
-                </button>
-                <button id="judge0-sign-out-btn" class="ui basic button" data-content="Sign out">
-                    <i class="sign-out icon"></i>
-                    <span id="judge0-puter-username">Sign out</span>
-                </button>
+            <div class="item">
+                <span class="ui mini text" style="color: #888;">Ctrl+I for AI</span>
             </div>
         </div>
     </div>
@@ -175,47 +124,6 @@
                 <i class="close icon"></i>
                 Close (ESC)
             </div>
-        </div>
-    </div>
-
-    <div id="judge0-chat-container" class="ui segment">
-        <div class="ui top attached borderless menu">
-            <div class="item">
-                <div class="ui toggle checked checkbox">
-                    <input id="judge0-inline-suggestions" type="checkbox" checked="">
-                    <label>Inline Suggestions</label>
-                </div>
-            </div>
-            <div class="right menu">
-                <div class="fitted item">
-                    <select id="judge0-chat-model-select" class="ui search selection dropdown item">
-                        <option>gpt-4o-mini</option>
-                        <option>gpt-4o</option>
-                        <option>o3-mini</option>
-                        <option>o1-mini</option>
-                        <option>claude-3-5-sonnet</option>
-                        <option>deepseek-chat</option>
-                        <option>deepseek-reasoner</option>
-                        <option>meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo</option>
-                        <option>meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo</option>
-                        <option>meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo</option>
-                        <option>mistral-large-latest</option>
-                        <option>pixtral-large-latest</option>
-                        <option>codestral-latest</option>
-                        <option>google/gemma-2-27b-it</option>
-                        <option>grok-beta</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div id="judge0-chat-messages"></div>
-        <div id="judge0-chat-input-container" class="ui basic segment">
-            <form id="judge0-chat-form" class="ui fluid action input">
-                <input id="judge0-chat-user-input" type="text">
-                <button id="judge0-chat-send-button" class="ui primary icon button" type="submit">
-                    <i class="arrow up icon"></i>
-                </button>
-            </form>
         </div>
     </div>
 
