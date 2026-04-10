@@ -1,5 +1,6 @@
 import { usePuter } from "./puter.js";
 import configuration from "./configuration.js";
+import aiApi from "./ai-api.js";
 
 const API_KEY = "";
 
@@ -187,6 +188,45 @@ function getSelectedLanguageId() {
 
 function getSelectedLanguageFlavor() {
     return $selectLanguage.find(":selected").attr("flavor");
+}
+
+function runAIMode() {
+    const prompt = sourceEditor.getValue().trim();
+    
+    if (prompt === "") {
+        showError("AI Mode", "Please enter some text in the editor before using AI mode.");
+        return;
+    }
+    
+    // Show loading state
+    stdoutEditor.setValue("");
+    $statusLine.html("AI: Processing...");
+    
+    // Focus on output panel
+    let x = layout.root.getItemsById("stdout")[0];
+    x.parent.header.parent.setActiveContentItem(x);
+    
+    // Get the language name for context
+    const languageSelect = $selectLanguage.find(":selected");
+    const languageName = languageSelect.text();
+    
+    // Clear the editor
+    sourceEditor.setValue("");
+    
+    // Call the AI API
+    aiApi.sendPrompt(prompt, languageName)
+        .then(response => {
+            // Show AI response in output with label
+            const outputWithLabel = `=== AI Response ===\n\n${response.output}`;
+            stdoutEditor.setValue(outputWithLabel);
+            $statusLine.html("AI: Response received");
+        })
+        .catch(error => {
+            // Show error in output
+            const errorOutput = `=== AI Error ===\n\n${error.message}`;
+            stdoutEditor.setValue(errorOutput);
+            $statusLine.html("AI: Error occurred");
+        });
 }
 
 function run() {
@@ -555,6 +595,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 case "`":
                     e.preventDefault();
                     sourceEditor.focus();
+                    break;
+                case "i":
+                    e.preventDefault();
+                    runAIMode();
                     break;
             }
         }
