@@ -14,12 +14,12 @@
 
 Judge0 IDE is using [**Judge0**](https://ce.judge0.com) for executing the user's source code.
 
-This version includes **AI support** using the Anthropic API. Press **Ctrl+I** to send your code or text to AI and get a response in the output panel.
+This version includes **AI support** using the Anthropic API. Press **Alt+I** to send your code or text to AI and get a response in the output panel.
 
 ### Features
 
 - **Code Execution**: Run code in 40+ languages using Judge0
-- **AI Assistance**: Press Ctrl+I to get AI help via Anthropic Claude
+- **AI Assistance**: Press Alt+I to get AI help via Anthropic Claude
 - **Dark Theme**: Modern dark theme for comfortable coding
 - **Split View**: Editor on left, input/output on right
 
@@ -117,7 +117,7 @@ Create a `.env` file in the `backend` directory:
 ### AI Mode
 
 1. Write code or a natural language prompt in the editor
-2. Press **Ctrl+I** to send to AI
+2. Press **Alt+I** to send to AI
 3. The editor will clear and the AI response appears in the output panel
 
 ### Keyboard Shortcuts
@@ -125,7 +125,7 @@ Create a `.env` file in the `backend` directory:
 | Shortcut | Action |
 |----------|--------|
 | Ctrl+Enter | Run code |
-| Ctrl+I | AI mode (send to Anthropic) |
+| Alt+I | AI mode (send to Anthropic) |
 | Ctrl+S | Save |
 | Ctrl+O | Open file |
 | Ctrl+` | Focus editor |

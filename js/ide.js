@@ -549,7 +549,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     $statusLine = $("#judge0-status-line");
 
     $(document).on("keydown", "body", function (e) {
-        if (e.metaKey || e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
             switch (e.key) {
                 case "Enter":
                     e.preventDefault();
@@ -583,11 +583,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     e.preventDefault();
                     sourceEditor.focus();
                     break;
-                case "i":
-                    e.preventDefault();
-                    runAIMode();
-                    break;
             }
+        }
+        // Alt+I for AI mode
+        if (e.altKey && e.key.toLowerCase() === "i") {
+            e.preventDefault();
+            runAIMode();
         }
     });
 
