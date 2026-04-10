@@ -5,23 +5,49 @@ import ls from "./local_storage.js";
 const DEFAULT_CONFIGURATIONS = {
     default: {
         theme: "system",
-        style: "default",
+        style: "compiler",
         styleOptions: {
-            showLogo: true,
-            showFileMenu: true,
-            showHelpMenu: true,
+            showLogo: false,
+            showFileMenu: false,
+            showHelpMenu: false,
             showSelectLanguage: true,
-            showCompilerOptions: true,
-            showCommandLineArguments: true,
+            showCompilerOptions: false,
+            showCommandLineArguments: false,
             showRunButton: true,
-            showThemeButton: true,
-            showPuterSignInOutButton: true,
+            showThemeButton: false,
+            showPuterSignInOutButton: false,
             showStatusLine: true,
-            showCopyright: true,
+            showCopyright: false,
             showNavigation: true
         },
         appOptions: {
-            showAIAssistant: true,
+            showAIAssistant: false,
+            ioLayout: "stack",
+            assistantLayout: "column",
+            mainLayout: "row",
+            showInput: true,
+            showOutput: true
+        }
+    },
+    compiler: {
+        theme: "system",
+        style: "compiler",
+        styleOptions: {
+            showLogo: false,
+            showFileMenu: false,
+            showHelpMenu: false,
+            showSelectLanguage: true,
+            showCompilerOptions: false,
+            showCommandLineArguments: false,
+            showRunButton: true,
+            showThemeButton: false,
+            showPuterSignInOutButton: false,
+            showStatusLine: true,
+            showCopyright: false,
+            showNavigation: true
+        },
+        appOptions: {
+            showAIAssistant: false,
             ioLayout: "stack",
             assistantLayout: "column",
             mainLayout: "row",
