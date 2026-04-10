@@ -20,6 +20,7 @@ This version includes **AI support** using the Anthropic API. Press **Alt+I** to
 
 - **Code Execution**: Run code in 40+ languages using Judge0
 - **AI Assistance**: Press Alt+I to get AI help via Anthropic Claude
+- **Complexity Estimator**: Click "Complexity" button or press Ctrl+Shift+C to get heuristic complexity analysis
 - **Dark Theme**: Modern dark theme for comfortable coding
 - **Split View**: Editor on left, input/output on right
 
@@ -125,6 +126,7 @@ Create a `.env` file in the `backend` directory:
 | Shortcut | Action |
 |----------|--------|
 | Ctrl+Enter | Run code |
+| Ctrl+Shift+C | Complexity check |
 | Alt+I | AI mode (send to Anthropic) |
 | Ctrl+S | Save |
 | Ctrl+O | Open file |
@@ -135,8 +137,32 @@ Create a `.env` file in the `backend` directory:
 The backend provides these endpoints:
 
 - `POST /api/ai` - Send prompt to Anthropic
+- `POST /api/complexity` - Get complexity estimation for C++ code
 - `POST /api/submit` - Submit code to Judge0
 - `GET /api/submissions/:token` - Get submission result
+
+### Complexity Estimator
+
+The complexity endpoint analyzes C++ code using heuristic pattern detection:
+
+```bash
+curl -X POST http://localhost:3001/api/complexity \
+  -H "Content-Type: application/json" \
+  -d '{"language": "cpp", "code": "for(int i=0; i<n; i++) {}"}'
+```
+
+Response:
+```json
+{
+  "complexity": "O(n)",
+  "confidence": 0.5,
+  "tleRisk": "Low",
+  "reasons": ["Detected single loop bounded by n"]
+}
+```
+
+**Note**: This is a heuristic estimator, not a mathematical proof. It's optimized for C++ and provides approximate complexity based on common patterns like loops, sorting, and recursion.
+
 - `GET /api/health` - Health check
 
 ## Community

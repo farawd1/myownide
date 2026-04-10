@@ -3,6 +3,8 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
+const { analyzeComplexity } = require('./complexity');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -145,6 +147,27 @@ app.get('/api/submissions/:token', async (req, res) => {
     console.error('Judge0 result error:', error.message);
     res.status(error.response?.status || 500).json({
       error: error.message || 'Failed to get submission result'
+    });
+  }
+});
+
+// Complexity estimator endpoint
+app.post('/api/complexity', (req, res) => {
+  try {
+    const { language, code } = req.body;
+    
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ 
+        error: 'Code is required and must be a string' 
+      });
+    }
+
+    const result = analyzeComplexity(language || 'cpp', code);
+    res.json(result);
+  } catch (error) {
+    console.error('Complexity analysis error:', error.message);
+    res.status(500).json({
+      error: 'Failed to analyze complexity'
     });
   }
 });
