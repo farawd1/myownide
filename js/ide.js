@@ -223,6 +223,72 @@ function runAIMode() {
         });
 }
 
+function runComplexityCheck() {
+    const code = sourceEditor.getValue().trim();
+    
+    if (code === "") {
+        showError("Complexity Check", "Please enter some code in the editor.");
+        return;
+    }
+    
+    // Show loading state
+    stdoutEditor.setValue("Analyzing complexity...");
+    $statusLine.html("Complexity: Analyzing...");
+    
+    // Focus on output panel
+    let x = layout.root.getItemsById("stdout")[0];
+    x.parent.header.parent.setActiveContentItem(x);
+    
+    // Get language
+    const languageSelect = $selectLanguage.find(":selected");
+    const languageId = getSelectedLanguageId();
+    const flavor = getSelectedLanguageFlavor();
+    
+    // Map language IDs to simple language names
+    const languageMap = {
+        50: 'c', 54: 'cpp', 60: 'java', 62: 'python', 63: 'csharp', 
+        71: 'python3', 72: 'cpp', 74: 'go', 75: 'rust', 76: 'scala'
+    };
+    const languageName = languageMap[languageId] || 'cpp';
+    
+    // Call complexity API
+    fetch(`${API_BASE_URL}/api/complexity`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            language: languageName,
+            code: code
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Format output
+        let output = `=== Complexity Estimation (Heuristic) ===\n\n`;
+        output += `Estimated Complexity: ${data.complexity}\n`;
+        output += `Confidence: ${Math.round(data.confidence * 100)}%\n`;
+        output += `TLE Risk: ${data.tleRisk}\n\n`;
+        output += `Reasons:\n`;
+        if (data.reasons && data.reasons.length > 0) {
+            data.reasons.forEach(reason => {
+                output += `  • ${reason}\n`;
+            });
+        } else {
+            output += `  (none)\n`;
+        }
+        output += `\n=== Note ===\nThis is a heuristic estimate based on pattern detection.`;
+        
+        stdoutEditor.setValue(output);
+        $statusLine.html("Complexity: Done");
+    })
+    .catch(error => {
+        const errorOutput = `=== Complexity Error ===\n\nFailed to analyze: ${error.message}`;
+        stdoutEditor.setValue(errorOutput);
+        $statusLine.html("Complexity: Error");
+    });
+}
+
 function run() {
     if (sourceEditor.getValue().trim() === "") {
         showError("Error", "Source code can't be empty!");
@@ -537,6 +603,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     $runBtn = $("#run-btn");
     $runBtn.click(run);
 
+    // Complexity Check button
+    $("#complexity-btn").click(runComplexityCheck);
+
     $("#open-file-input").change(function (e) {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
@@ -589,6 +658,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 case "`":
                     e.preventDefault();
                     sourceEditor.focus();
+                    break;
+                case "C":
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        runComplexityCheck();
+                    }
                     break;
             }
         }
