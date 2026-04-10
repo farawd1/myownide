@@ -51,13 +51,20 @@ var languages = {};
 var layoutConfig = {
     settings: {
         showPopoutIcon: false,
-        reorderEnabled: false
+        reorderEnabled: false,
+        showCloseIcon: false,
+        headerHeight: 28,
+        tabWidth: 100
+    },
+    dimensions: {
+        headerHeight: 28,
+        borderWidth: 1
     },
     content: [{
-        type: configuration.get("appOptions.mainLayout"),
+        type: "row",
         content: [{
             type: "component",
-            width: 66,
+            width: 60,
             componentName: "source",
             id: "source",
             title: "Code",
@@ -66,29 +73,29 @@ var layoutConfig = {
                 readOnly: false
             }
         }, {
-            type: configuration.get("appOptions.ioLayout"),
-            title: "Input / Output",
-            content: [
-                configuration.get("appOptions.showInput") ? {
-                    type: "component",
-                    height: 30,
-                    componentName: "stdin",
-                    id: "stdin",
-                    title: "Input",
-                    isClosable: false,
-                    componentState: {
-                        readOnly: false
-                    }
-                } : null, configuration.get("appOptions.showOutput") ? {
-                    type: "component",
-                    componentName: "stdout",
-                    id: "stdout",
-                    title: "Output",
-                    isClosable: false,
-                    componentState: {
-                        readOnly: true
-                    }
-                } : null].filter(Boolean)
+            type: "stack",
+            width: 40,
+            title: "I/O",
+            content: [{
+                type: "component",
+                height: 35,
+                componentName: "stdin",
+                id: "stdin",
+                title: "Input",
+                isClosable: false,
+                componentState: {
+                    readOnly: false
+                }
+            }, {
+                type: "component",
+                componentName: "stdout",
+                id: "stdout",
+                title: "Output",
+                isClosable: false,
+                componentState: {
+                    readOnly: true
+                }
+            }]
         }]
     }]
 };
