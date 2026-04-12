@@ -11,6 +11,9 @@ const AUTH_HEADERS = API_KEY ? {
 const CE = "CE";
 const EXTRA_CE = "EXTRA_CE";
 
+// Backend API URL for custom endpoints (AI, Complexity)
+const API_BASE_URL = "http://localhost:3001";
+
 const AUTHENTICATED_CE_BASE_URL = "https://ce.judge0.com";
 const AUTHENTICATED_EXTRA_CE_BASE_URL = "https://extra-ce.judge0.com";
 
