@@ -1,6 +1,6 @@
 import { usePuter } from "./puter.js";
 import configuration from "./configuration.js";
-import aiApi from "./ai-api.js";
+import aiApi, { API_BASE_URL } from "./ai-api.js";
 
 const API_KEY = "";
 
