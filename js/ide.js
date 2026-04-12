@@ -224,69 +224,73 @@ function runAIMode() {
 }
 
 function runComplexityCheck() {
-    const code = sourceEditor.getValue().trim();
-    
-    if (code === "") {
-        showError("Complexity Check", "Please enter some code in the editor.");
+    const code = sourceEditor.getValue();
+
+    if (!code || !code.trim()) {
+        stdoutEditor.setValue("Complexity error:\nEditor is empty.");
         return;
     }
-    
+
     // Show loading state
     stdoutEditor.setValue("Analyzing complexity...");
     $statusLine.html("Complexity: Analyzing...");
-    
+
     // Focus on output panel
     let x = layout.root.getItemsById("stdout")[0];
     x.parent.header.parent.setActiveContentItem(x);
-    
+
     // Get language
-    const languageSelect = $selectLanguage.find(":selected");
     const languageId = getSelectedLanguageId();
-    const flavor = getSelectedLanguageFlavor();
-    
+
     // Map language IDs to simple language names
     const languageMap = {
-        50: 'c', 54: 'cpp', 60: 'java', 62: 'python', 63: 'csharp', 
+        50: 'c', 54: 'cpp', 60: 'java', 62: 'python', 63: 'csharp',
         71: 'python3', 72: 'cpp', 74: 'go', 75: 'rust', 76: 'scala'
     };
     const languageName = languageMap[languageId] || 'cpp';
-    
-    // Call complexity API
-    fetch(`${API_BASE_URL}/api/complexity`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            language: languageName,
-            code: code
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Format output
-        let output = `=== Complexity Estimation (Heuristic) ===\n\n`;
-        output += `Estimated Complexity: ${data.complexity}\n`;
-        output += `Confidence: ${Math.round(data.confidence * 100)}%\n`;
-        output += `TLE Risk: ${data.tleRisk}\n\n`;
-        output += `Reasons:\n`;
-        if (data.reasons && data.reasons.length > 0) {
-            data.reasons.forEach(reason => {
-                output += `  • ${reason}\n`;
+
+    // Use async/await with proper error handling
+    (async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/complexity`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    language: languageName,
+                    code: code
+                })
             });
-        } else {
-            output += `  (none)\n`;
+
+            // Safely parse JSON
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data?.details || data?.error || "Complexity request failed");
+            }
+
+            // Format output
+            let output = data.summary || "No result returned.";
+
+            if (data.reasons && Array.isArray(data.reasons) && data.reasons.length > 0) {
+                output += "\n\nReasons:\n";
+                data.reasons.forEach(reason => {
+                    output += `- ${reason}\n`;
+                });
+            }
+
+            output += "\n\n=== Note ===\nThis is a heuristic estimate based on pattern detection.";
+
+            stdoutEditor.setValue(output);
+            $statusLine.html("Complexity: Done");
+        } catch (error) {
+            stdoutEditor.setValue(
+                `Complexity error:\n${error instanceof Error ? error.message : "Unknown error"}`
+            );
+            $statusLine.html("Complexity: Error");
         }
-        output += `\n=== Note ===\nThis is a heuristic estimate based on pattern detection.`;
-        
-        stdoutEditor.setValue(output);
-        $statusLine.html("Complexity: Done");
-    })
-    .catch(error => {
-        const errorOutput = `=== Complexity Error ===\n\nFailed to analyze: ${error.message}`;
-        stdoutEditor.setValue(errorOutput);
-        $statusLine.html("Complexity: Error");
-    });
+    })();
 }
 
 function run() {
