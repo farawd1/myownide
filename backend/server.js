@@ -3,7 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
-const { estimateComplexity } = require('./complexity-analyzer');
+const { estimateComplexity } = require('./complexity-tree-sitter');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
