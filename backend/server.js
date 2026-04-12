@@ -3,7 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
-const { analyzeComplexity } = require('./complexity');
+const { estimateComplexity } = require('./complexity-analyzer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -154,20 +154,38 @@ app.get('/api/submissions/:token', async (req, res) => {
 // Complexity estimator endpoint
 app.post('/api/complexity', (req, res) => {
   try {
-    const { language, code } = req.body;
-    
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ 
-        error: 'Code is required and must be a string' 
+    console.log("[complexity] request received");
+
+    const { language, code } = req.body || {};
+
+    console.log("[complexity] language:", language);
+    console.log("[complexity] code length:", code ? code.length : 0);
+
+    if (!code || typeof code !== "string") {
+      return res.status(400).json({ error: "code is required" });
+    }
+
+    if (language && language !== "cpp") {
+      return res.json({
+        complexity: "Unknown",
+        confidence: 0.2,
+        tleRisk: "Unknown",
+        summary: "Complexity estimation is currently optimized for C++ only.",
+        reasons: ["Current analyzer MVP supports C++ best"]
       });
     }
 
-    const result = analyzeComplexity(language || 'cpp', code);
-    res.json(result);
+    const result = estimateComplexity(code);
+
+    console.log("[complexity] result:", result.complexity);
+
+    return res.json(result);
   } catch (error) {
-    console.error('Complexity analysis error:', error.message);
-    res.status(500).json({
-      error: 'Failed to analyze complexity'
+    console.error("[complexity] error:", error);
+
+    return res.status(500).json({
+      error: "Failed to estimate complexity",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
