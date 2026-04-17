@@ -16,9 +16,9 @@ class AutoTyper {
         this.minSpeed = 80;       // Minimum speed for boilerplate (was 20)
         this.maxSpeed = 250;      // Maximum speed for "thinking" (was 150)
         
-        // Human-like error configuration - MORE ERRORS
-        this.errorRate = 0.08;    // 8% chance of typo (was 2%)
-        this.correctionChance = 0.5; // 50% chance to correct typo immediately (was 30%)
+        // Human-like error configuration - LESS ERRORS NOW
+        this.errorRate = 0.01;    // 1% chance of typo (was 8%)
+        this.correctionChance = 0.7; // 70% chance to correct typo immediately (was 50%)
         
         // Thinking pauses
         this.thinkChance = 0.15;   // 15% chance to pause and "think"
@@ -77,9 +77,18 @@ class AutoTyper {
     
     /**
      * Type a line with potential errors and corrections
+     * Handles indentation (tabs/spaces) at the beginning of line
      */
     async typeLineWithErrors(line) {
         let i = 0;
+        
+        // Handle leading indentation - type tabs/spaces as-is (no errors)
+        while (i < line.length && (line[i] === '\t' || line[i] === ' ')) {
+            await this.typeChar(line[i]);
+            i++;
+        }
+        
+        // Type remaining content with potential errors
         while (i < line.length) {
             if (!this.isRunning) return;
             
@@ -90,7 +99,7 @@ class AutoTyper {
             
             const char = line[i];
             
-            // Check for typo
+            // Check for typo (only for alphanumeric characters)
             if (Math.random() < this.errorRate && char.match(/[a-zA-Z0-9]/)) {
                 // Generate wrong character
                 const wrongChar = this.generateTypo(char);
