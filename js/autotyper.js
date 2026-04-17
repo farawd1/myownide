@@ -11,20 +11,22 @@ class AutoTyper {
         this.currentPosition = 0;
         this.code = '';
         
-        // Typing speed configuration (ms per character)
-        this.baseSpeed = 50;      // Base typing speed
-        this.minSpeed = 20;      // Minimum speed for boilerplate
-        this.maxSpeed = 150;     // Maximum speed for "thinking"
+        // Typing speed configuration (ms per character) - MUCH SLOWER
+        this.baseSpeed = 120;     // Base typing speed
+        this.minSpeed = 80;       // Minimum speed for boilerplate (was 20)
+        this.maxSpeed = 250;      // Maximum speed for "thinking" (was 150)
         
-        // Human-like error configuration
-        this.errorRate = 0.02;   // 2% chance of typo
-        this.correctionChance = 0.3; // 30% chance to correct typo immediately
+        // Human-like error configuration - MORE ERRORS
+        this.errorRate = 0.08;    // 8% chance of typo (was 2%)
+        this.correctionChance = 0.5; // 50% chance to correct typo immediately (was 30%)
+        
+        // Thinking pauses
+        this.thinkChance = 0.15;   // 15% chance to pause and "think"
+        this.thinkDuration = 800; // How long to think (ms)
     }
     
     /**
      * Start typing the provided code
-     * @param {string} code - The code to type
-     * @param {Function} onComplete - Callback when typing is complete
      */
     async start(code, onComplete = null) {
         if (this.isRunning) {
@@ -39,11 +41,10 @@ class AutoTyper {
         // Clear the editor first
         this.editor.setValue('');
         
-        // Parse code into segments for different typing speeds
-        const segments = this.parseSegments(code);
+        // Type line by line for proper formatting
+        const lines = code.split('\n');
         
-        // Type each segment
-        for (const segment of segments) {
+        for (let i = 0; i < lines.length; i++) {
             if (!this.isRunning) break;
             
             while (this.isPaused) {
@@ -51,7 +52,20 @@ class AutoTyper {
                 if (!this.isRunning) break;
             }
             
-            await this.typeSegment(segment.text, segment.speed);
+            const line = lines[i];
+            
+            // Random thinking pause before some lines
+            if (Math.random() < this.thinkChance && i > 0) {
+                await this.sleep(this.thinkDuration + Math.random() * 1000);
+            }
+            
+            // Type each character in the line
+            await this.typeLineWithErrors(line);
+            
+            // Press Enter for new line (except last line)
+            if (i < lines.length - 1) {
+                await this.pressEnter();
+            }
         }
         
         this.isRunning = false;
@@ -62,67 +76,11 @@ class AutoTyper {
     }
     
     /**
-     * Parse code into segments with different speed requirements
+     * Type a line with potential errors and corrections
      */
-    parseSegments(code) {
-        const segments = [];
-        const lines = code.split('\n');
-        
-        let currentSegment = '';
-        let currentSpeed = this.baseSpeed;
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const trimmed = line.trim();
-            
-            // Determine speed based on line content
-            let speed = this.baseSpeed;
-            
-            // Boilerplate lines - faster
-            if (trimmed.startsWith('#include') || 
-                trimmed.startsWith('using') ||
-                trimmed.startsWith('const') ||
-                trimmed.startsWith('int main') ||
-                trimmed === '}' ||
-                trimmed === '{' ||
-                trimmed === '' ||
-                trimmed.startsWith('return')) {
-                speed = this.minSpeed;
-            }
-            // Core logic - slower (thinking)
-            else if (trimmed.includes('if') || 
-                     trimmed.includes('for') || 
-                     trimmed.includes('while') ||
-                     trimmed.includes('update') ||
-                     trimmed.includes('get') ||
-                     trimmed.includes('query')) {
-                speed = this.maxSpeed;
-            }
-            
-            // If speed changed, push previous segment and start new one
-            if (speed !== currentSpeed && currentSegment.length > 0) {
-                segments.push({ text: currentSegment + '\n', speed: currentSpeed });
-                currentSegment = '';
-            } else {
-                currentSegment += (currentSegment ? '\n' : '') + line;
-            }
-            
-            currentSpeed = speed;
-        }
-        
-        // Push remaining segment
-        if (currentSegment) {
-            segments.push({ text: currentSegment, speed: currentSpeed });
-        }
-        
-        return segments;
-    }
-    
-    /**
-     * Type a segment of text with potential errors
-     */
-    async typeSegment(text, speed) {
-        for (let i = 0; i < text.length; i++) {
+    async typeLineWithErrors(line) {
+        let i = 0;
+        while (i < line.length) {
             if (!this.isRunning) return;
             
             while (this.isPaused) {
@@ -130,33 +88,42 @@ class AutoTyper {
                 if (!this.isRunning) return;
             }
             
-            const char = text[i];
+            const char = line[i];
             
-            // Random chance of error
+            // Check for typo
             if (Math.random() < this.errorRate && char.match(/[a-zA-Z0-9]/)) {
-                // Generate a wrong character (nearby on keyboard)
+                // Generate wrong character
                 const wrongChar = this.generateTypo(char);
-                await this.typeChar(wrongChar, speed);
                 
-                // Maybe correct it immediately
+                // Type the wrong character
+                await this.typeChar(wrongChar);
+                
+                // Maybe correct it after a delay
                 if (Math.random() < this.correctionChance) {
-                    await this.sleep(speed * 2);
-                    // Backspace
-                    await this.backspace(1, speed / 2);
-                    // Type correct char
-                    await this.typeChar(char, speed);
+                    await this.sleep(this.baseSpeed * 2);
+                    await this.backspace(1);
+                    await this.typeChar(char);
+                } else {
+                    // If not correcting immediately, continue with wrong char
+                    // But later realize and correct
+                    if (Math.random() < 0.3) {
+                        await this.sleep(this.baseSpeed * 3);
+                        await this.backspace(1);
+                        await this.typeChar(char);
+                    }
                 }
             } else {
-                await this.typeChar(char, speed);
+                await this.typeChar(char);
             }
+            
+            i++;
         }
     }
     
     /**
      * Type a single character
      */
-    async typeChar(char, speed) {
-        const currentContent = this.editor.getValue();
+    async typeChar(char) {
         const position = this.editor.getPosition();
         
         // Insert character at current cursor position
@@ -176,15 +143,43 @@ class AutoTyper {
             column: position.column + 1
         });
         
-        // Variable delay to simulate natural typing rhythm
-        const delay = speed * (0.8 + Math.random() * 0.4);
+        // Variable delay - human typing isn't consistent
+        // Add some randomness to the speed
+        const randomFactor = 0.5 + Math.random(); // 0.5 to 1.5
+        const delay = this.baseSpeed * randomFactor;
         await this.sleep(delay);
     }
     
     /**
-     * Simulate backspace
+     * Press Enter to go to next line
      */
-    async backspace(count = 1, speed = 25) {
+    async pressEnter() {
+        const position = this.editor.getPosition();
+        
+        this.editor.executeEdits('autotyper', [{
+            range: {
+                startLineNumber: position.lineNumber,
+                startColumn: position.column,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column
+            },
+            text: '\n'
+        }]);
+        
+        // Move to next line, column 1
+        this.editor.setPosition({
+            lineNumber: position.lineNumber + 1,
+            column: 1
+        });
+        
+        // Small delay after enter
+        await this.sleep(this.baseSpeed * 0.8);
+    }
+    
+    /**
+     * Simulate backspace - delete character before cursor
+     */
+    async backspace(count = 1) {
         for (let i = 0; i < count; i++) {
             if (!this.isRunning) return;
             
@@ -216,7 +211,8 @@ class AutoTyper {
                 });
             }
             
-            await this.sleep(speed);
+            // Backspace speed - usually faster than typing
+            await this.sleep(60 + Math.random() * 40);
         }
     }
     
