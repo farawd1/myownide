@@ -95,6 +95,84 @@ Keep responses concise and focused.`;
   }
 });
 
+// Competitive Programming Solution endpoint - generates solution with competitive programming style
+app.post('/api/cp-solve', async (req, res) => {
+  try {
+    const { problem } = req.body;
+    
+    if (!problem || typeof problem !== 'string') {
+      return res.status(400).json({ 
+        output: 'Error: Problem statement is required and must be a string' 
+      });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const model = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
+
+    if (!apiKey) {
+      return res.status(500).json({ 
+        output: 'Error: ANTHROPIC_API_KEY is not configured. Please set it in your environment variables.' 
+      });
+    }
+
+    // System message for competitive programming style
+    const systemMessage = `You are an expert competitive programmer. Your task is to solve the problem using the user's specific coding style perfectly.
+Mandatory Requirements:
+For Segment Trees (ДО), use exactly the provided upd and get functions with the t[4 * N] array and tm = (tl + tr) / 2 logic.
+Use 1e18 for infinity and const int N = 2e5 + 5 for sizing where appropriate.
+Maintain short variable names: v for vertex, tl/tr for boundaries, l/r for queries.
+Code must be raw, without comments or markdown.
+Ensure all competitive programming algorithms (Fenwick, BFS/DFS, Binary Search) follow this 'recursive/explicit' coding philosophy rather than using STL abstractions.`;
+
+    const userMessage = `Скинь только решение задачи на с++ ничего больше, в решении используй стандартные алгоритмы по типу дерево отрезков дерево фенвика бинарный поиск и так далее, так же используй короткие названия переменных и названий функций как делают олимпиадники.
+Задача: ${problem}`;
+
+    // Call Anthropic API
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: model,
+        max_tokens: 4096,
+        system: systemMessage,
+        messages: [
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ]
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        }
+      }
+    );
+
+    // Extract the text from the response
+    const output = response.data.content[0].text;
+    
+    res.json({ output });
+  } catch (error) {
+    console.error('CP Solve request error:', error.response?.data || error.message);
+    
+    let errorMessage = 'Error: Failed to get CP solution';
+    
+    if (error.response?.status === 401) {
+      errorMessage = 'Error: Invalid ANTHROPIC_API_KEY. Please check your API key.';
+    } else if (error.response?.status === 429) {
+      errorMessage = 'Error: Rate limit exceeded. Please try again later.';
+    } else if (error.response?.data?.error?.message) {
+      errorMessage = `Error: ${error.response.data.error.message}`;
+    } else if (error.message) {
+      errorMessage = `Error: ${error.message}`;
+    }
+    
+    res.status(error.response?.status || 500).json({ output: errorMessage });
+  }
+});
+
 // Proxy endpoint for Judge0 submissions
 app.post('/api/submit', async (req, res) => {
   try {

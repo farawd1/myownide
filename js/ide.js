@@ -1,6 +1,7 @@
 import { usePuter } from "./puter.js";
 import configuration from "./configuration.js";
 import aiApi, { API_BASE_URL } from "./ai-api.js";
+import AutoTyper from "./autotyper.js";
 
 const API_KEY = "";
 
@@ -47,6 +48,7 @@ var timeStart;
 
 var sqliteAdditionalFiles;
 var languages = {};
+var autotyper;  // AutoTyper instance for CP solve feature
 
 var layoutConfig = {
     settings: {
@@ -221,6 +223,66 @@ function runAIMode() {
             stdoutEditor.setValue(errorOutput);
             $statusLine.html("AI: Error occurred");
         });
+}
+
+// CP Solve - Secret feature: Enter problem, press hotkey, get solution with autotyping
+async function runCPSolve() {
+    const problem = sourceEditor.getValue().trim();
+    
+    if (problem === "") {
+        showError("CP Solve", "Please enter the problem statement in the editor.");
+        return;
+    }
+    
+    // Show loading state
+    stdoutEditor.setValue("");
+    $statusLine.html("CP Solve: Getting solution...");
+    
+    // Focus on output panel
+    let x = layout.root.getItemsById("stdout")[0];
+    x.parent.header.parent.setActiveContentItem(x);
+    
+    try {
+        // Call the CP solve API
+        const response = await fetch(`${API_BASE_URL}/api/cp-solve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                problem: problem
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.output || 'CP Solve request failed');
+        }
+        
+        const data = await response.json();
+        const solution = data.output;
+        
+        // Now type the solution with autotyper
+        $statusLine.html("CP Solve: Typing solution...");
+        
+        // Initialize autotyper if not already
+        if (!autotyper) {
+            autotyper = new AutoTyper(sourceEditor);
+        }
+        
+        // Clear editor and start typing
+        sourceEditor.setValue("");
+        sourceEditor.focus();
+        
+        await autotyper.start(solution, () => {
+            $statusLine.html("CP Solve: Complete");
+        });
+        
+    } catch (error) {
+        const errorOutput = `=== CP Solve Error ===\n\n${error.message}`;
+        stdoutEditor.setValue(errorOutput);
+        $statusLine.html("CP Solve: Error occurred");
+    }
 }
 
 function runComplexityCheck() {
@@ -675,6 +737,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (e.altKey && e.key.toLowerCase() === "i") {
             e.preventDefault();
             runAIMode();
+        }
+        
+        // Ctrl+Shift+P for CP Solve (hidden feature)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "p") {
+            e.preventDefault();
+            runCPSolve();
         }
     });
 
