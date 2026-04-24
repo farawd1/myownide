@@ -1,483 +1,550 @@
-import { usePuter } from "./puter.js";
-import configuration from "./configuration.js";
-import aiApi, { API_BASE_URL } from "./ai-api.js";
-import AutoTyper from "./autotyper.js";
-
-const API_KEY = "";
-
-const AUTH_HEADERS = API_KEY ? {
-    "Authorization": `Bearer ${API_KEY}`
-} : {};
+import aiApi from "./ai-api.js";
 
 const CE = "CE";
 const EXTRA_CE = "EXTRA_CE";
+const INITIAL_WAIT_TIME_MS = 250;
+const MAX_PROBE_REQUESTS = 240;
+const DEFAULT_LANGUAGE_ID = 105;
+const APPEARANCE_STORAGE_KEY = "myownide.appearance";
 
-const AUTHENTICATED_CE_BASE_URL = "https://ce.judge0.com";
-const AUTHENTICATED_EXTRA_CE_BASE_URL = "https://extra-ce.judge0.com";
-
-var AUTHENTICATED_BASE_URL = {};
-AUTHENTICATED_BASE_URL[CE] = AUTHENTICATED_CE_BASE_URL;
-AUTHENTICATED_BASE_URL[EXTRA_CE] = AUTHENTICATED_EXTRA_CE_BASE_URL;
-
-const UNAUTHENTICATED_CE_BASE_URL = "https://ce.judge0.com";
-const UNAUTHENTICATED_EXTRA_CE_BASE_URL = "https://extra-ce.judge0.com";
-
-var UNAUTHENTICATED_BASE_URL = {};
-UNAUTHENTICATED_BASE_URL[CE] = UNAUTHENTICATED_CE_BASE_URL;
-UNAUTHENTICATED_BASE_URL[EXTRA_CE] = UNAUTHENTICATED_EXTRA_CE_BASE_URL;
-
-const INITIAL_WAIT_TIME_MS = 0;
-const WAIT_TIME_FUNCTION = i => 100;
-const MAX_PROBE_REQUESTS = 600;
-
-var fontSize = 13;
-
-var layout;
-
-export var sourceEditor;
-var stdinEditor;
-var stdoutEditor;
-
-var $selectLanguage;
-var $compilerOptions;
-var $commandLineArguments;
-var $runBtn;
-var $statusLine;
-
-var timeStart;
-
-var sqliteAdditionalFiles;
-var languages = {};
-var autotyper;  // AutoTyper instance for CP solve feature
-
-var layoutConfig = {
-    settings: {
-        showPopoutIcon: false,
-        reorderEnabled: false,
-        showCloseIcon: false,
-        headerHeight: 28,
-        tabWidth: 100
-    },
-    dimensions: {
-        headerHeight: 28,
-        borderWidth: 1
-    },
-    content: [{
-        type: "row",
-        content: [{
-            type: "component",
-            width: 60,
-            componentName: "source",
-            id: "source",
-            title: "Code",
-            isClosable: false,
-            componentState: {
-                readOnly: false
-            }
-        }, {
-            type: "stack",
-            width: 40,
-            title: "I/O",
-            content: [{
-                type: "component",
-                height: 35,
-                componentName: "stdin",
-                id: "stdin",
-                title: "Input",
-                isClosable: false,
-                componentState: {
-                    readOnly: false
-                }
-            }, {
-                type: "component",
-                componentName: "stdout",
-                id: "stdout",
-                title: "Output",
-                isClosable: false,
-                componentState: {
-                    readOnly: true
-                }
-            }]
-        }]
-    }]
+const AUTHENTICATED_BASE_URL = {
+    [CE]: "https://ce.judge0.com",
+    [EXTRA_CE]: "https://extra-ce.judge0.com"
 };
 
-var gPuterFile;
+const UNAUTHENTICATED_BASE_URL = {
+    [CE]: "https://ce.judge0.com",
+    [EXTRA_CE]: "https://extra-ce.judge0.com"
+};
+
+const EXTENSIONS_TABLE = {
+    asm: { flavor: CE, language_id: 45 },
+    c: { flavor: CE, language_id: 103 },
+    cpp: { flavor: CE, language_id: 105 },
+    cs: { flavor: EXTRA_CE, language_id: 29 },
+    go: { flavor: CE, language_id: 95 },
+    java: { flavor: CE, language_id: 91 },
+    js: { flavor: CE, language_id: 102 },
+    lua: { flavor: CE, language_id: 64 },
+    pas: { flavor: CE, language_id: 67 },
+    php: { flavor: CE, language_id: 98 },
+    py: { flavor: EXTRA_CE, language_id: 25 },
+    r: { flavor: CE, language_id: 99 },
+    rb: { flavor: CE, language_id: 72 },
+    rs: { flavor: CE, language_id: 73 },
+    scala: { flavor: CE, language_id: 81 },
+    sh: { flavor: CE, language_id: 46 },
+    swift: { flavor: CE, language_id: 83 },
+    ts: { flavor: CE, language_id: 101 },
+    txt: { flavor: CE, language_id: 43 }
+};
+
+const state = {
+    sourceEditor: null,
+    stdinEditor: null,
+    stdoutEditor: null,
+    languageDetails: {},
+    currentFilename: "main.cpp",
+    sqliteAdditionalFiles: null,
+    lastStressInput: "",
+    lastRunReviewContext: null,
+    appearance: {
+        theme: "dark",
+        accentColor: "#f59e0b",
+        fontSize: 14,
+        fontFamily: "JetBrains Mono"
+    }
+};
+
+const elements = {};
 
 function encode(str) {
     return btoa(unescape(encodeURIComponent(str || "")));
 }
 
-function decode(bytes) {
-    var escaped = escape(atob(bytes || ""));
+function decode(str) {
+    if (!str) {
+        return "";
+    }
+
     try {
-        return decodeURIComponent(escaped);
+        return decodeURIComponent(escape(atob(str)));
     } catch {
-        return unescape(escaped);
+        return str;
     }
 }
 
-function showError(title, content) {
-    $("#judge0-site-modal #title").html(title);
+function showModal(title, content) {
+    $("#judge0-site-modal #title").text(title);
     $("#judge0-site-modal .content").html(content);
-
-    let reportTitle = encodeURIComponent(`Error on ${window.location.href}`);
-    let reportBody = encodeURIComponent(
-        `**Error Title**: ${title}\n` +
-        `**Error Timestamp**: \`${new Date()}\`\n` +
-        `**Origin**: ${window.location.href}\n` +
-        `**Description**:\n${content}`
-    );
-
-    $("#report-problem-btn").attr("href", `https://github.com/judge0/ide/issues/new?title=${reportTitle}&body=${reportBody}`);
     $("#judge0-site-modal").modal("show");
 }
 
-function showHttpError(jqXHR) {
-    showError(`${jqXHR.statusText} (${jqXHR.status})`, `<pre>${JSON.stringify(jqXHR, null, 4)}</pre>`);
+function setStatus(message) {
+    elements.statusLine.textContent = message;
 }
 
-function handleRunError(jqXHR) {
-    showHttpError(jqXHR);
-    $runBtn.removeClass("loading");
-
-    window.top.postMessage(JSON.parse(JSON.stringify({
-        event: "runError",
-        data: jqXHR
-    })), "*");
-}
-
-function handleResult(data) {
-    const tat = Math.round(performance.now() - timeStart);
-    console.log(`It took ${tat}ms to get submission result.`);
-
-    const status = data.status;
-    const stdout = decode(data.stdout);
-    const compileOutput = decode(data.compile_output);
-    const time = (data.time === null ? "-" : data.time + "s");
-    const memory = (data.memory === null ? "-" : data.memory + "KB");
-
-    $statusLine.html(`${status.description}, ${time}, ${memory} (TAT: ${tat}ms)`);
-
-    const output = [compileOutput, stdout].filter(x => x).join("\n").trimEnd();
-
-    stdoutEditor.setValue(output);
-
-    $runBtn.removeClass("loading");
-
-    window.top.postMessage(JSON.parse(JSON.stringify({
-        event: "postExecution",
-        status: data.status,
-        time: data.time,
-        memory: data.memory,
-        output: output
-    })), "*");
-}
-
-async function getSelectedLanguage() {
-    return getLanguage(getSelectedLanguageFlavor(), getSelectedLanguageId())
+function setReviewButtonVisible(visible) {
+    elements.reviewCodeBtn.hidden = !visible;
+    elements.reviewCodeBtn.disabled = !visible;
 }
 
 function getSelectedLanguageId() {
-    return parseInt($selectLanguage.val());
+    return Number(elements.languageSelect.value);
 }
 
 function getSelectedLanguageFlavor() {
-    return $selectLanguage.find(":selected").attr("flavor");
+    return elements.languageSelect.selectedOptions[0]?.getAttribute("flavor") || CE;
 }
 
-function runAIMode() {
-    const prompt = sourceEditor.getValue().trim();
-    
-    if (prompt === "") {
-        showError("AI Mode", "Please enter some text in the editor before using AI mode.");
-        return;
-    }
-    
-    // Show loading state
-    stdoutEditor.setValue("");
-    $statusLine.html("AI: Processing...");
-    
-    // Focus on output panel
-    let x = layout.root.getItemsById("stdout")[0];
-    x.parent.header.parent.setActiveContentItem(x);
-    
-    // Get the language name for context
-    const languageSelect = $selectLanguage.find(":selected");
-    const languageName = languageSelect.text();
-    
-    // Clear the editor
-    sourceEditor.setValue("");
-    
-    // Call the AI API
-    aiApi.sendPrompt(prompt, languageName)
-        .then(response => {
-            // Show AI response in output with label
-            const outputWithLabel = `=== AI Response ===\n\n${response.output}`;
-            stdoutEditor.setValue(outputWithLabel);
-            $statusLine.html("AI: Response received");
-        })
-        .catch(error => {
-            // Show error in output
-            const errorOutput = `=== AI Error ===\n\n${error.message}`;
-            stdoutEditor.setValue(errorOutput);
-            $statusLine.html("AI: Error occurred");
-        });
+function getSelectedLanguageName() {
+    return elements.languageSelect.selectedOptions[0]?.textContent || "C++";
 }
 
-// CP Solve - Secret feature: Enter problem, press hotkey, get solution with autotyping
-async function runCPSolve() {
-    const problem = sourceEditor.getValue().trim();
-    
-    if (problem === "") {
-        showError("CP Solve", "Please enter the problem statement in the editor.");
-        return;
-    }
-    
-    // Show loading state
-    stdoutEditor.setValue("");
-    $statusLine.html("CP Solve: Getting solution...");
-    
-    // Focus on output panel
-    let x = layout.root.getItemsById("stdout")[0];
-    x.parent.header.parent.setActiveContentItem(x);
-    
-    try {
-        // Call the CP solve API
-        const response = await fetch(`${API_BASE_URL}/api/cp-solve`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                problem: problem
-            })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.output || 'CP Solve request failed');
-        }
-        
-        const data = await response.json();
-        const solution = data.output;
-        
-        // Now type the solution with autotyper
-        $statusLine.html("CP Solve: Typing solution...");
-        
-        // Initialize autotyper if not already
-        if (!autotyper) {
-            autotyper = new AutoTyper(sourceEditor);
-        }
-        
-        // Clear editor and start typing
-        sourceEditor.setValue("");
-        sourceEditor.focus();
-        
-        await autotyper.start(solution, () => {
-            $statusLine.html("CP Solve: Complete");
-        });
-        
-    } catch (error) {
-        const errorOutput = `=== CP Solve Error ===\n\n${error.message}`;
-        stdoutEditor.setValue(errorOutput);
-        $statusLine.html("CP Solve: Error occurred");
-    }
-}
-
-function runComplexityCheck() {
-    const code = sourceEditor.getValue();
-
-    if (!code || !code.trim()) {
-        stdoutEditor.setValue("Complexity error:\nEditor is empty.");
-        return;
-    }
-
-    // Show loading state
-    stdoutEditor.setValue("Analyzing complexity...");
-    $statusLine.html("Complexity: Analyzing...");
-
-    // Focus on output panel
-    let x = layout.root.getItemsById("stdout")[0];
-    x.parent.header.parent.setActiveContentItem(x);
-
-    // Get language
-    const languageId = getSelectedLanguageId();
-
-    // Map language IDs to simple language names
-    const languageMap = {
-        50: 'c', 54: 'cpp', 60: 'java', 62: 'python', 63: 'csharp',
-        71: 'python3', 72: 'cpp', 74: 'go', 75: 'rust', 76: 'scala'
+function getEditorLanguageMode(languageName) {
+    const table = {
+        Bash: "shell",
+        C: "c",
+        C3: "c",
+        "C#": "csharp",
+        "C++": "cpp",
+        Go: "go",
+        Java: "java",
+        JavaScript: "javascript",
+        Kotlin: "kotlin",
+        Lua: "lua",
+        Pascal: "pascal",
+        PHP: "php",
+        Python: "python",
+        R: "r",
+        Ruby: "ruby",
+        Rust: "rust",
+        Scala: "scala",
+        SQL: "sql",
+        Swift: "swift",
+        TypeScript: "typescript"
     };
-    const languageName = languageMap[languageId] || 'cpp';
 
-    // Use async/await with proper error handling
-    (async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/complexity`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    language: languageName,
-                    code: code
-                })
-            });
-
-            // Safely parse JSON
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(data?.details || data?.error || "Complexity request failed");
-            }
-
-            // Format output
-            let output = data.summary || "No result returned.";
-
-            if (data.reasons && Array.isArray(data.reasons) && data.reasons.length > 0) {
-                output += "\n\nReasons:\n";
-                data.reasons.forEach(reason => {
-                    output += `- ${reason}\n`;
-                });
-            }
-
-            output += "\n\n=== Note ===\nThis is a heuristic estimate based on pattern detection.";
-
-            stdoutEditor.setValue(output);
-            $statusLine.html("Complexity: Done");
-        } catch (error) {
-            stdoutEditor.setValue(
-                `Complexity error:\n${error instanceof Error ? error.message : "Unknown error"}`
-            );
-            $statusLine.html("Complexity: Error");
+    for (const [key, mode] of Object.entries(table)) {
+        if (languageName.toLowerCase().startsWith(key.toLowerCase())) {
+            return mode;
         }
-    })();
+    }
+
+    return "plaintext";
 }
 
-function run() {
-    if (sourceEditor.getValue().trim() === "") {
-        showError("Error", "Source code can't be empty!");
-        return;
-    } else {
-        $runBtn.addClass("loading");
+function getLanguageForExtension(extension) {
+    return EXTENSIONS_TABLE[extension] || { flavor: CE, language_id: 43 };
+}
+
+function loadAppearance() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY) || "{}");
+        state.appearance = {
+            ...state.appearance,
+            ...saved
+        };
+    } catch {
+        state.appearance = { ...state.appearance };
+    }
+}
+
+function persistAppearance() {
+    localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify(state.appearance));
+}
+
+function updateAppearanceControls() {
+    elements.themeSelect.value = state.appearance.theme;
+    elements.accentColor.value = state.appearance.accentColor;
+    elements.fontSize.value = String(state.appearance.fontSize);
+    elements.fontSizeValue.textContent = `${state.appearance.fontSize}px`;
+    elements.fontFamily.value = state.appearance.fontFamily;
+}
+
+function applyAppearance() {
+    document.body.dataset.theme = state.appearance.theme;
+    document.documentElement.style.setProperty("--accent", state.appearance.accentColor);
+    document.documentElement.style.setProperty("--accent-strong", state.appearance.accentColor);
+
+    const editorTheme = state.appearance.theme === "dark" ? "vs-dark" : "vs";
+    [state.sourceEditor, state.stdinEditor, state.stdoutEditor].forEach(editor => {
+        if (editor) {
+            editor.updateOptions({
+                fontSize: state.appearance.fontSize,
+                fontFamily: state.appearance.fontFamily
+            });
+        }
+    });
+
+    if (typeof monaco !== "undefined") {
+        monaco.editor.setTheme(editorTheme);
     }
 
-    stdoutEditor.setValue("");
-    $statusLine.html("");
+    const themeMeta = document.querySelector("meta[name='theme-color']");
+    if (themeMeta) {
+        themeMeta.setAttribute("content", state.appearance.theme === "dark" ? "#111827" : "#ffffff");
+    }
+}
 
-    let x = layout.root.getItemsById("stdout")[0];
-    x.parent.header.parent.setActiveContentItem(x);
+function toggleAppearancePanel(forceOpen = null) {
+    const shouldOpen = forceOpen === null
+        ? !elements.appearancePanel.classList.contains("is-open")
+        : forceOpen;
 
-    let sourceValue = encode(sourceEditor.getValue());
-    let stdinValue = encode(stdinEditor.getValue());
-    let languageId = getSelectedLanguageId();
-    let compilerOptions = $compilerOptions.val();
-    let commandLineArguments = $commandLineArguments.val();
+    elements.appearancePanel.classList.toggle("is-open", shouldOpen);
+}
 
-    let flavor = getSelectedLanguageFlavor();
-
-    if (languageId === 44) {
-        sourceValue = sourceEditor.getValue();
+async function loadLanguageDetail(flavor, languageId) {
+    const key = `${flavor}:${languageId}`;
+    if (state.languageDetails[key]) {
+        return state.languageDetails[key];
     }
 
-    let data = {
-        source_code: sourceValue,
+    const response = await fetch(`${UNAUTHENTICATED_BASE_URL[flavor]}/languages/${languageId}`);
+    const data = await response.json();
+    state.languageDetails[key] = data;
+    return data;
+}
+
+async function handleLanguageChange() {
+    const languageName = getSelectedLanguageName();
+    monaco.editor.setModelLanguage(state.sourceEditor.getModel(), getEditorLanguageMode(languageName));
+    const detail = await loadLanguageDetail(getSelectedLanguageFlavor(), getSelectedLanguageId());
+    state.currentFilename = detail.source_file || state.currentFilename;
+}
+
+async function loadLanguages() {
+    const [ceResponse, extraResponse] = await Promise.all([
+        fetch(`${UNAUTHENTICATED_BASE_URL[CE]}/languages`),
+        fetch(`${UNAUTHENTICATED_BASE_URL[EXTRA_CE]}/languages`)
+    ]);
+    const [ceLanguages, extraLanguages] = await Promise.all([ceResponse.json(), extraResponse.json()]);
+
+    const options = [];
+
+    ceLanguages.forEach(language => {
+        if (language.id !== 89) {
+            options.push({ ...language, flavor: CE });
+        }
+    });
+
+    extraLanguages.forEach(language => {
+        if (language.id !== 89 && !options.some(item => item.name === language.name)) {
+            options.push({ ...language, flavor: EXTRA_CE });
+        }
+    });
+
+    options.sort((a, b) => a.name.localeCompare(b.name));
+
+    options.forEach(language => {
+        const option = document.createElement("option");
+        option.value = language.id;
+        option.textContent = language.name;
+        option.setAttribute("flavor", language.flavor);
+        elements.languageSelect.appendChild(option);
+    });
+
+    elements.languageSelect.value = String(DEFAULT_LANGUAGE_ID);
+    $("#select-language").dropdown();
+    await handleLanguageChange();
+}
+
+async function submitToJudge0(sourceCode, stdin) {
+    const languageId = getSelectedLanguageId();
+    const flavor = getSelectedLanguageFlavor();
+    const payload = {
+        source_code: languageId === 44 ? sourceCode : encode(sourceCode),
         language_id: languageId,
-        stdin: stdinValue,
-        compiler_options: compilerOptions,
-        command_line_arguments: commandLineArguments,
+        stdin: encode(stdin),
         redirect_stderr_to_stdout: true
     };
 
-    let sendRequest = function (data) {
-        window.top.postMessage(JSON.parse(JSON.stringify({
-            event: "preExecution",
-            source_code: sourceEditor.getValue(),
-            language_id: languageId,
-            flavor: flavor,
-            stdin: stdinEditor.getValue(),
-            compiler_options: compilerOptions,
-            command_line_arguments: commandLineArguments
-        })), "*");
-
-        timeStart = performance.now();
-        $.ajax({
-            url: `${AUTHENTICATED_BASE_URL[flavor]}/submissions?base64_encoded=true&wait=false`,
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            headers: AUTH_HEADERS,
-            success: function (data, textStatus, request) {
-                console.log(`Your submission token is: ${data.token}`);
-                let region = request.getResponseHeader('X-Judge0-Region');
-                setTimeout(fetchSubmission.bind(null, flavor, region, data.token, 1), INITIAL_WAIT_TIME_MS);
-            },
-            error: handleRunError
-        });
-    }
-
     if (languageId === 82) {
-        if (!sqliteAdditionalFiles) {
-            $.ajax({
-                url: `./data/additional_files_zip_base64.txt`,
-                contentType: "text/plain",
-                success: function (responseData) {
-                    sqliteAdditionalFiles = responseData;
-                    data["additional_files"] = sqliteAdditionalFiles;
-                    sendRequest(data);
-                },
-                error: handleRunError
-            });
+        if (!state.sqliteAdditionalFiles) {
+            const response = await fetch("./data/additional_files_zip_base64.txt");
+            state.sqliteAdditionalFiles = await response.text();
         }
-        else {
-            data["additional_files"] = sqliteAdditionalFiles;
-            sendRequest(data);
-        }
-    } else {
-        sendRequest(data);
+        payload.additional_files = state.sqliteAdditionalFiles;
     }
+
+    const response = await fetch(`${AUTHENTICATED_BASE_URL[flavor]}/submissions?base64_encoded=true&wait=false`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Judge0 submit failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return { flavor, token: data.token };
 }
 
-function fetchSubmission(flavor, region, submission_token, iteration) {
+async function pollSubmission(flavor, token, iteration = 0) {
     if (iteration >= MAX_PROBE_REQUESTS) {
-        handleRunError({
-            statusText: "Maximum number of probe requests reached.",
-            status: 504
-        }, null, null);
+        throw new Error("Maximum number of probe requests reached.");
+    }
+
+    const response = await fetch(`${UNAUTHENTICATED_BASE_URL[flavor]}/submissions/${token}?base64_encoded=true`);
+
+    if (!response.ok) {
+        throw new Error(`Judge0 poll failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.status?.id <= 2) {
+        await new Promise(resolve => setTimeout(resolve, INITIAL_WAIT_TIME_MS + iteration * 60));
+        return pollSubmission(flavor, token, iteration + 1);
+    }
+
+    return data;
+}
+
+function formatExecutionResult(data) {
+    const output = [decode(data.compile_output), decode(data.stdout), decode(data.stderr)]
+        .filter(Boolean)
+        .join("\n")
+        .trim();
+
+    return {
+        statusId: data.status?.id ?? null,
+        status: data.status?.description || "Unknown",
+        output,
+        time: data.time ?? "-",
+        memory: data.memory ?? "-"
+    };
+}
+
+function shouldOfferReview(result) {
+    const reviewableStatusIds = new Set([5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const reviewableStatusNames = new Set([
+        "Compilation Error",
+        "Runtime Error (NZEC)",
+        "Runtime Error (SIGSEGV)",
+        "Runtime Error (SIGXFSZ)",
+        "Runtime Error (SIGFPE)",
+        "Runtime Error (SIGABRT)",
+        "Runtime Error (NZEC)",
+        "Runtime Error",
+        "Time Limit Exceeded",
+        "Internal Error",
+        "Exec Format Error"
+    ]);
+
+    if (!result) {
+        return false;
+    }
+
+    if (result.statusId && reviewableStatusIds.has(result.statusId)) {
+        return true;
+    }
+
+    if (result.status && reviewableStatusNames.has(result.status)) {
+        return true;
+    }
+
+    return /^run error:/i.test(result.output || "");
+}
+
+async function reviewCurrentCode() {
+    if (!state.lastRunReviewContext) {
+        showModal("Review Code", "Сначала запустите код и дождитесь ошибки, после этого появится разбор.");
         return;
     }
 
-    $.ajax({
-        url: `${UNAUTHENTICATED_BASE_URL[flavor]}/submissions/${submission_token}?base64_encoded=true`,
-        headers: {
-            "X-Judge0-Region": region
-        },
-        success: function (data) {
-            if (data.status.id <= 2) { // In Queue or Processing
-                $statusLine.html(data.status.description);
-                setTimeout(fetchSubmission.bind(null, flavor, region, submission_token, iteration + 1), WAIT_TIME_FUNCTION(iteration));
-            } else {
-                handleResult(data);
-            }
-        },
-        error: handleRunError
-    });
+    try {
+        elements.reviewCodeBtn.classList.add("loading");
+        setStatus("ИИ анализирует ошибку...");
+        const prompt = [
+            "Проанализируй ошибку в коде и объясни, как её исправить.",
+            "Ответь на русском языке.",
+            "Структура ответа:",
+            "1. В чем причина ошибки",
+            "2. Что именно исправить",
+            "3. Исправленный фрагмент или идея исправления",
+            "",
+            `Язык: ${state.lastRunReviewContext.language}`,
+            `Статус запуска: ${state.lastRunReviewContext.status}`,
+            "",
+            "Код:",
+            state.lastRunReviewContext.code,
+            "",
+            "Ввод:",
+            state.lastRunReviewContext.stdin || "(пусто)",
+            "",
+            "Вывод/ошибка:",
+            state.lastRunReviewContext.output || "(пусто)"
+        ].join("\n");
+
+        const result = await aiApi.sendPrompt(prompt, state.lastRunReviewContext.language);
+        showModal("AI Review Code", `<div style="white-space: pre-wrap;">${$("<div>").text(result.output || "").html()}</div>`);
+        setStatus("ИИ подготовил разбор ошибки");
+    } catch (error) {
+        showModal("AI Review Code", `<div style="white-space: pre-wrap;">${$("<div>").text(error.message).html()}</div>`);
+        setStatus("Не удалось получить разбор ошибки");
+    } finally {
+        elements.reviewCodeBtn.classList.remove("loading");
+    }
 }
 
-function setSourceCodeName(name) {
-    $(".lm_title")[0].innerText = name;
+async function runCode(stdin = state.stdinEditor.getValue()) {
+    const sourceCode = state.sourceEditor.getValue().trim();
+
+    if (!sourceCode) {
+        showModal("Run Error", "Source code cannot be empty.");
+        return;
+    }
+
+    try {
+        elements.runBtn.classList.add("loading");
+        setReviewButtonVisible(false);
+        state.lastRunReviewContext = null;
+        setStatus("Running...");
+        const { flavor, token } = await submitToJudge0(state.sourceEditor.getValue(), stdin);
+        const submission = await pollSubmission(flavor, token);
+        const result = formatExecutionResult(submission);
+        state.stdoutEditor.setValue(result.output || result.status);
+        setStatus(`${result.status} | ${result.time}s | ${result.memory}KB`);
+
+        if (shouldOfferReview(result)) {
+            state.lastRunReviewContext = {
+                language: getSelectedLanguageName(),
+                status: result.status,
+                code: state.sourceEditor.getValue(),
+                stdin,
+                output: result.output || result.status
+            };
+            setReviewButtonVisible(true);
+        }
+    } catch (error) {
+        state.stdoutEditor.setValue(`Run error:\n${error.message}`);
+        state.lastRunReviewContext = {
+            language: getSelectedLanguageName(),
+            status: "Run error",
+            code: state.sourceEditor.getValue(),
+            stdin,
+            output: `Run error:\n${error.message}`
+        };
+        setReviewButtonVisible(true);
+        setStatus("Run failed");
+    } finally {
+        elements.runBtn.classList.remove("loading");
+    }
 }
 
-function getSourceCodeName() {
-    return $(".lm_title")[0].innerText;
+async function analyzeComplexity() {
+    const code = state.sourceEditor.getValue().trim();
+    if (!code) {
+        elements.complexityResult.textContent = "Editor is empty.";
+        return;
+    }
+
+    try {
+        elements.complexityBtn.classList.add("loading");
+        setStatus("Analyzing complexity...");
+        const result = await aiApi.getComplexity(code, getSelectedLanguageName(), "");
+        elements.complexityResult.textContent = result.complexity || "Unknown";
+        setStatus("Complexity analyzed");
+    } catch (error) {
+        elements.complexityResult.textContent = `Error: ${error.message}`;
+        setStatus("Complexity failed");
+    } finally {
+        elements.complexityBtn.classList.remove("loading");
+    }
+}
+
+function buildArray(values) {
+    return `${values.length}\n${values.join(" ")}\n`;
+}
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getStressConfig() {
+    const size = Math.max(0, Number(elements.stressSize.value) || 0);
+    let min = Number(elements.stressMin.value);
+    let max = Number(elements.stressMax.value);
+
+    if (min > max) {
+        [min, max] = [max, min];
+    }
+
+    return { size, min, max };
+}
+
+function generateStressPreset(kind) {
+    const { size, min, max } = getStressConfig();
+    let values = [];
+
+    switch (kind) {
+        case "empty":
+            values = [];
+            break;
+        case "zeros":
+            values = Array(size).fill(0);
+            break;
+        case "negative":
+            values = Array.from({ length: size }, () => -Math.abs(randomInt(Math.min(min, -1), Math.max(max, 1))));
+            break;
+        case "increasing":
+            values = Array.from({ length: size }, (_, index) => min + index);
+            break;
+        case "decreasing":
+            values = Array.from({ length: size }, (_, index) => max - index);
+            break;
+        case "constant":
+            values = Array(size).fill(randomInt(min, max));
+            break;
+        case "alternating":
+            values = Array.from({ length: size }, (_, index) => index % 2 === 0 ? max : min);
+            break;
+        case "duplicates":
+            values = Array.from({ length: size }, () => randomInt(min, Math.min(max, min + 2)));
+            break;
+        case "single":
+            values = [randomInt(min, max)];
+            break;
+        case "random":
+        default:
+            values = Array.from({ length: size }, () => randomInt(min, max));
+            break;
+    }
+
+    const input = buildArray(values);
+    state.lastStressInput = input;
+    elements.stressPreview.textContent = input;
+}
+
+function replaceInputWithStress() {
+    if (!state.lastStressInput) {
+        generateStressPreset("random");
+    }
+    state.stdinEditor.setValue(state.lastStressInput);
+}
+
+function appendInputWithStress() {
+    if (!state.lastStressInput) {
+        generateStressPreset("random");
+    }
+
+    const current = state.stdinEditor.getValue().trimEnd();
+    const next = state.lastStressInput.trim();
+    const joined = current ? `${current}\n${next}\n` : `${next}\n`;
+    state.stdinEditor.setValue(joined);
 }
 
 function openFile(content, filename) {
-    clear();
-    sourceEditor.setValue(content);
-    selectLanguageForExtension(filename.split(".").pop());
-    setSourceCodeName(filename);
+    state.sourceEditor.setValue(content);
+    state.currentFilename = filename;
+    const extension = (filename.split(".").pop() || "").toLowerCase();
+    const language = getLanguageForExtension(extension);
+    selectLanguageByFlavorAndId(language.language_id, language.flavor);
 }
 
 function saveFile(content, filename) {
@@ -487,640 +554,213 @@ function saveFile(content, filename) {
     link.download = filename;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(link.href);
 }
 
-async function openAction() {
-    if (usePuter()) {
-        gPuterFile = await puter.ui.showOpenFilePicker();
-        openFile(await (await gPuterFile.read()).text(), gPuterFile.name);
-    } else {
-        document.getElementById("open-file-input").click();
-    }
-}
-
-async function saveAction() {
-    if (usePuter()) {
-        if (gPuterFile) {
-            gPuterFile.write(sourceEditor.getValue());
-        } else {
-            gPuterFile = await puter.ui.showSaveFilePicker(sourceEditor.getValue(), getSourceCodeName());
-            setSourceCodeName(gPuterFile.name);
-        }
-    } else {
-        saveFile(sourceEditor.getValue(), getSourceCodeName());
-    }
-}
-
-function setFontSizeForAllEditors(fontSize) {
-    sourceEditor.updateOptions({ fontSize: fontSize });
-    stdinEditor.updateOptions({ fontSize: fontSize });
-    stdoutEditor.updateOptions({ fontSize: fontSize });
-}
-
-async function loadLangauges() {
-    return new Promise((resolve, reject) => {
-        let options = [];
-
-        $.ajax({
-            url: UNAUTHENTICATED_CE_BASE_URL + "/languages",
-            success: function (data) {
-                for (let i = 0; i < data.length; i++) {
-                    let language = data[i];
-                    let option = new Option(language.name, language.id);
-                    option.setAttribute("flavor", CE);
-                    option.setAttribute("langauge_mode", getEditorLanguageMode(language.name));
-
-                    if (language.id !== 89) {
-                        options.push(option);
-                    }
-
-                    if (language.id === DEFAULT_LANGUAGE_ID) {
-                        option.selected = true;
-                    }
-                }
-            },
-            error: reject
-        }).always(function () {
-            $.ajax({
-                url: UNAUTHENTICATED_EXTRA_CE_BASE_URL + "/languages",
-                success: function (data) {
-                    for (let i = 0; i < data.length; i++) {
-                        let language = data[i];
-                        let option = new Option(language.name, language.id);
-                        option.setAttribute("flavor", EXTRA_CE);
-                        option.setAttribute("langauge_mode", getEditorLanguageMode(language.name));
-
-                        if (options.findIndex((t) => (t.text === option.text)) === -1 && language.id !== 89) {
-                            options.push(option);
-                        }
-                    }
-                },
-                error: reject
-            }).always(function () {
-                options.sort((a, b) => a.text.localeCompare(b.text));
-                $selectLanguage.append(options);
-                resolve();
-            });
-        });
-    });
-};
-
-async function loadSelectedLanguage(skipSetDefaultSourceCodeName = false) {
-    monaco.editor.setModelLanguage(sourceEditor.getModel(), $selectLanguage.find(":selected").attr("langauge_mode"));
-
-    if (!skipSetDefaultSourceCodeName) {
-        setSourceCodeName((await getSelectedLanguage()).source_file);
-    }
-}
-
 function selectLanguageByFlavorAndId(languageId, flavor) {
-    let option = $selectLanguage.find(`[value=${languageId}][flavor=${flavor}]`);
-    if (option.length) {
-        option.prop("selected", true);
-        $selectLanguage.trigger("change", { skipSetDefaultSourceCodeName: true });
+    const option = [...elements.languageSelect.options].find(item => Number(item.value) === Number(languageId) && item.getAttribute("flavor") === flavor);
+    if (!option) {
+        return;
     }
+
+    elements.languageSelect.value = option.value;
+    elements.languageSelect.dispatchEvent(new Event("change"));
 }
 
-function selectLanguageForExtension(extension) {
-    let language = getLanguageForExtension(extension);
-    selectLanguageByFlavorAndId(language.language_id, language.flavor);
+function createEditors() {
+    state.sourceEditor = monaco.editor.create(elements.sourceEditor, {
+        value: DEFAULT_SOURCE,
+        language: "cpp",
+        theme: "vs-dark",
+        automaticLayout: true,
+        fontFamily: state.appearance.fontFamily,
+        fontSize: state.appearance.fontSize,
+        minimap: { enabled: false }
+    });
+
+    state.stdinEditor = monaco.editor.create(elements.stdinEditor, {
+        value: DEFAULT_STDIN,
+        language: "plaintext",
+        theme: "vs-dark",
+        automaticLayout: true,
+        fontFamily: state.appearance.fontFamily,
+        fontSize: Math.max(12, state.appearance.fontSize - 1),
+        minimap: { enabled: false }
+    });
+
+    state.stdoutEditor = monaco.editor.create(elements.stdoutEditor, {
+        value: "",
+        language: "plaintext",
+        theme: "vs-dark",
+        readOnly: true,
+        automaticLayout: true,
+        fontFamily: state.appearance.fontFamily,
+        fontSize: Math.max(12, state.appearance.fontSize - 1),
+        minimap: { enabled: false }
+    });
 }
 
-async function getLanguage(flavor, languageId) {
-    return new Promise((resolve, reject) => {
-        if (languages[flavor] && languages[flavor][languageId]) {
-            resolve(languages[flavor][languageId]);
+function bindEvents() {
+    elements.languageSelect.addEventListener("change", handleLanguageChange);
+    elements.runBtn.addEventListener("click", () => runCode());
+    elements.openFileBtn.addEventListener("click", () => elements.openFileInput.click());
+    elements.saveBtn.addEventListener("click", () => saveFile(state.sourceEditor.getValue(), state.currentFilename));
+    elements.reviewCodeBtn.addEventListener("click", reviewCurrentCode);
+    elements.appearanceBtn.addEventListener("click", () => toggleAppearancePanel(true));
+    elements.closeAppearanceBtn.addEventListener("click", () => toggleAppearancePanel(false));
+    elements.appearancePanel.addEventListener("click", event => {
+        if (event.target === elements.appearancePanel) {
+            toggleAppearancePanel(false);
+        }
+    });
+
+    elements.themeSelect.addEventListener("change", () => {
+        state.appearance.theme = elements.themeSelect.value;
+        persistAppearance();
+        applyAppearance();
+    });
+
+    elements.accentColor.addEventListener("input", () => {
+        state.appearance.accentColor = elements.accentColor.value;
+        persistAppearance();
+        applyAppearance();
+    });
+
+    elements.fontSize.addEventListener("input", () => {
+        state.appearance.fontSize = Number(elements.fontSize.value);
+        elements.fontSizeValue.textContent = `${state.appearance.fontSize}px`;
+        persistAppearance();
+        applyAppearance();
+    });
+
+    elements.fontFamily.addEventListener("change", () => {
+        state.appearance.fontFamily = elements.fontFamily.value;
+        persistAppearance();
+        applyAppearance();
+    });
+
+    elements.openFileInput.addEventListener("change", event => {
+        const file = event.target.files[0];
+        if (!file) {
             return;
         }
 
-        $.ajax({
-            url: `${UNAUTHENTICATED_BASE_URL[flavor]}/languages/${languageId}`,
-            success: function (data) {
-                if (!languages[flavor]) {
-                    languages[flavor] = {};
-                }
-
-                languages[flavor][languageId] = data;
-                resolve(data);
-            },
-            error: reject
-        });
-    });
-}
-
-function setDefaults() {
-    setFontSizeForAllEditors(fontSize);
-    sourceEditor.setValue(DEFAULT_SOURCE);
-    stdinEditor.setValue(DEFAULT_STDIN);
-    $compilerOptions.val(DEFAULT_COMPILER_OPTIONS);
-    $commandLineArguments.val(DEFAULT_CMD_ARGUMENTS);
-
-    $statusLine.html("");
-
-    loadSelectedLanguage();
-}
-
-function clear() {
-    sourceEditor.setValue("");
-    stdinEditor.setValue("");
-    $compilerOptions.val("");
-    $commandLineArguments.val("");
-
-    $statusLine.html("");
-}
-
-function refreshSiteContentHeight() {
-    const navigationHeight = document.getElementById("judge0-site-navigation").offsetHeight;
-
-    const siteContent = document.getElementById("judge0-site-content");
-    siteContent.style.height = `${window.innerHeight}px`;
-    siteContent.style.paddingTop = `${navigationHeight}px`;
-}
-
-function refreshLayoutSize() {
-    refreshSiteContentHeight();
-    layout.updateSize();
-}
-
-window.addEventListener("resize", refreshLayoutSize);
-document.addEventListener("DOMContentLoaded", async function () {
-    $(".ui.selection.dropdown").dropdown();
-    $("[data-content]").popup({
-        lastResort: "left center"
+        const reader = new FileReader();
+        reader.onload = loadEvent => openFile(loadEvent.target.result, file.name);
+        reader.readAsText(file);
+        event.target.value = "";
     });
 
-    refreshSiteContentHeight();
+    elements.complexityBtn.addEventListener("click", analyzeComplexity);
+    elements.runStressBtn.addEventListener("click", () => runCode(state.stdinEditor.getValue()));
+    elements.generateStressBtn.addEventListener("click", () => generateStressPreset(elements.stressPresetSelect.value));
+    elements.replaceInputBtn.addEventListener("click", replaceInputWithStress);
+    elements.appendInputBtn.addEventListener("click", appendInputWithStress);
+    elements.stressPresetSelect.addEventListener("change", () => generateStressPreset(elements.stressPresetSelect.value));
 
-    console.log("Hey, Judge0 IDE is open-sourced: https://github.com/judge0/ide. Have fun!");
-
-    $selectLanguage = $("#select-language");
-    $selectLanguage.change(function (event, data) {
-        let skipSetDefaultSourceCodeName = (data && data.skipSetDefaultSourceCodeName) || !!gPuterFile;
-        loadSelectedLanguage(skipSetDefaultSourceCodeName);
-    });
-
-    await loadLangauges();
-
-    $compilerOptions = $("#compiler-options");
-    $commandLineArguments = $("#command-line-arguments");
-
-    $runBtn = $("#run-btn");
-    $runBtn.click(run);
-
-    // Complexity Check button
-    $("#complexity-btn").click(runComplexityCheck);
-
-    $("#open-file-input").change(function (e) {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                openFile(e.target.result, selectedFile.name);
-            };
-
-            reader.onerror = function (e) {
-                showError("Error", "Error reading file: " + e.target.error);
-            };
-
-            reader.readAsText(selectedFile);
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            toggleAppearancePanel(false);
         }
-    });
 
-    $statusLine = $("#judge0-status-line");
-
-    $(document).on("keydown", "body", function (e) {
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
+        if (event.ctrlKey || event.metaKey) {
+            switch (event.key) {
                 case "Enter":
-                    e.preventDefault();
-                    run();
+                    event.preventDefault();
+                    runCode();
                     break;
                 case "s":
-                    e.preventDefault();
-                    saveAction();
+                    event.preventDefault();
+                    saveFile(state.sourceEditor.getValue(), state.currentFilename);
                     break;
                 case "o":
-                    e.preventDefault();
-                    openAction();
+                    event.preventDefault();
+                    elements.openFileInput.click();
                     break;
-                case "+":
-                case "=":
-                    e.preventDefault();
-                    fontSize += 1;
-                    setFontSizeForAllEditors(fontSize);
-                    break;
-                case "-":
-                    e.preventDefault();
-                    fontSize -= 1;
-                    setFontSizeForAllEditors(fontSize);
-                    break;
-                case "0":
-                    e.preventDefault();
-                    fontSize = 13;
-                    setFontSizeForAllEditors(fontSize);
-                    break;
-                case "`":
-                    e.preventDefault();
-                    sourceEditor.focus();
+                case ",":
+                    event.preventDefault();
+                    toggleAppearancePanel();
                     break;
                 case "C":
-                    if (e.shiftKey) {
-                        e.preventDefault();
-                        runComplexityCheck();
+                    if (event.shiftKey) {
+                        event.preventDefault();
+                        analyzeComplexity();
                     }
+                    break;
+                default:
                     break;
             }
         }
-        // Alt+I for AI mode
-        if (e.altKey && e.key.toLowerCase() === "i") {
-            e.preventDefault();
-            runAIMode();
-        }
-        
-        // Ctrl+Shift+P for CP Solve (hidden feature)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "p") {
-            e.preventDefault();
-            runCPSolve();
-        }
     });
+}
 
-    require(["vs/editor/editor.main"], function (ignorable) {
-        layout = new GoldenLayout(layoutConfig, $("#judge0-site-content"));
+function cacheElements() {
+    elements.languageSelect = document.getElementById("select-language");
+    elements.runBtn = document.getElementById("run-btn");
+    elements.openFileBtn = document.getElementById("open-file-btn");
+    elements.saveBtn = document.getElementById("save-btn");
+    elements.reviewCodeBtn = document.getElementById("review-code-btn");
+    elements.appearanceBtn = document.getElementById("appearance-btn");
+    elements.closeAppearanceBtn = document.getElementById("close-appearance-btn");
+    elements.appearancePanel = document.getElementById("appearance-panel");
+    elements.themeSelect = document.getElementById("theme-select");
+    elements.accentColor = document.getElementById("accent-color");
+    elements.fontSize = document.getElementById("font-size");
+    elements.fontSizeValue = document.getElementById("font-size-value");
+    elements.fontFamily = document.getElementById("font-family");
+    elements.sourceEditor = document.getElementById("source-editor");
+    elements.stdinEditor = document.getElementById("stdin-editor");
+    elements.stdoutEditor = document.getElementById("stdout-editor");
+    elements.statusLine = document.getElementById("status-line");
+    elements.complexityBtn = document.getElementById("complexity-btn");
+    elements.complexityResult = document.getElementById("complexity-result");
+    elements.stressSize = document.getElementById("stress-size");
+    elements.stressMin = document.getElementById("stress-min");
+    elements.stressMax = document.getElementById("stress-max");
+    elements.stressPresetSelect = document.getElementById("stress-preset-select");
+    elements.runStressBtn = document.getElementById("run-stress-btn");
+    elements.generateStressBtn = document.getElementById("generate-stress-btn");
+    elements.replaceInputBtn = document.getElementById("replace-input-btn");
+    elements.appendInputBtn = document.getElementById("append-input-btn");
+    elements.stressPreview = document.getElementById("stress-preview");
+    elements.openFileInput = document.getElementById("open-file-input");
+}
 
-        layout.registerComponent("source", function (container, state) {
-            sourceEditor = monaco.editor.create(container.getElement()[0], {
-                automaticLayout: true,
-                scrollBeyondLastLine: true,
-                readOnly: state.readOnly,
-                language: "cpp",
-                minimap: {
-                    enabled: true
-                }
-            });
-
-            sourceEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, run);
-
-            monaco.languages.registerInlineCompletionsProvider('*', {
-                provideInlineCompletions: async (model, position) => {
-                    if (!puter.auth.isSignedIn() || !document.getElementById("judge0-inline-suggestions").checked || !configuration.get("appOptions.showAIAssistant")) {
-                        return;
-                    }
-
-                    const textBeforeCursor = model.getValueInRange({
-                        startLineNumber: 1,
-                        startColumn: 1,
-                        endLineNumber: position.lineNumber,
-                        endColumn: position.column
-                    });
-
-                    const textAfterCursor = model.getValueInRange({
-                        startLineNumber: position.lineNumber,
-                        startColumn: position.column,
-                        endLineNumber: model.getLineCount(),
-                        endColumn: model.getLineMaxColumn(model.getLineCount())
-                    });
-
-                    const aiResponse = await puter.ai.chat([{
-                        role: "user",
-                        content: `You are a code completion assistant. Given the following context, generate the most likely code completion.
-
-                    ### Code Before Cursor:
-                    ${textBeforeCursor}
-
-                    ### Code After Cursor:
-                    ${textAfterCursor}
-
-                    ### Instructions:
-                    - Predict the next logical code segment.
-                    - Ensure the suggestion is syntactically and contextually correct.
-                    - Keep the completion concise and relevant.
-                    - Do not repeat existing code.
-                    - Provide only the missing code.
-                    - **Respond with only the code, without markdown formatting.**
-                    - **Do not include triple backticks (\`\`\`) or additional explanations.**
-
-                    ### Completion:`.trim()
-                    }], {
-                        model: document.getElementById("judge0-chat-model-select").value,
-                    });
-
-                    let aiResponseValue = aiResponse?.toString().trim() || "";
-
-                    if (Array.isArray(aiResponseValue)) {
-                        aiResponseValue = aiResponseValue.map(v => v.text).join("\n").trim();
-                    }
-
-                    if (!aiResponseValue || aiResponseValue.length === 0) {
-                        return;
-                    }
-
-                    return {
-                        items: [{
-                            insertText: aiResponseValue,
-                            range: new monaco.Range(
-                                position.lineNumber,
-                                position.column,
-                                position.lineNumber,
-                                position.column
-                            )
-                        }]
-                    };
-                },
-                handleItemDidShow: () => { },
-                freeInlineCompletions: () => { }
-            });
-        });
-
-        layout.registerComponent("stdin", function (container, state) {
-            stdinEditor = monaco.editor.create(container.getElement()[0], {
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                readOnly: state.readOnly,
-                language: "plaintext",
-                minimap: {
-                    enabled: false
-                }
-            });
-        });
-
-        layout.registerComponent("stdout", function (container, state) {
-            stdoutEditor = monaco.editor.create(container.getElement()[0], {
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                readOnly: state.readOnly,
-                language: "plaintext",
-                minimap: {
-                    enabled: false
-                }
-            });
-        });
-
-        layout.registerComponent("ai", function (container, state) {
-            container.getElement()[0].appendChild(document.getElementById("judge0-chat-container"));
-        });
-
-        layout.on("initialised", function () {
-            setDefaults();
-            refreshLayoutSize();
-            window.top.postMessage({ event: "initialised" }, "*");
-        });
-
-        layout.init();
-    });
-
-    let superKey = "⌘";
-    if (!/(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
-        superKey = "Ctrl";
-    }
-
-    [$runBtn].forEach(btn => {
-        btn.attr("data-content", `${superKey}${btn.attr("data-content")}`);
-    });
-
-    document.querySelectorAll(".description").forEach(e => {
-        e.innerText = `${superKey}${e.innerText}`;
-    });
-
-    if (usePuter()) {
-        puter.ui.onLaunchedWithItems(async function (items) {
-            gPuterFile = items[0];
-            openFile(await (await gPuterFile.read()).text(), gPuterFile.name);
-        });
-    }
-
-    document.getElementById("judge0-open-file-btn").addEventListener("click", openAction);
-    document.getElementById("judge0-save-btn").addEventListener("click", saveAction);
-
-    window.onmessage = function (e) {
-        if (!e.data) {
-            return;
-        }
-
-        if (e.data.action === "get") {
-            window.top.postMessage(JSON.parse(JSON.stringify({
-                event: "getResponse",
-                source_code: sourceEditor.getValue(),
-                language_id: getSelectedLanguageId(),
-                flavor: getSelectedLanguageFlavor(),
-                stdin: stdinEditor.getValue(),
-                stdout: stdoutEditor.getValue(),
-                compiler_options: $compilerOptions.val(),
-                command_line_arguments: $commandLineArguments.val()
-            })), "*");
-        } else if (e.data.action === "set") {
-            if (e.data.source_code) {
-                sourceEditor.setValue(e.data.source_code);
-            }
-            if (e.data.language_id && e.data.flavor) {
-                selectLanguageByFlavorAndId(e.data.language_id, e.data.flavor);
-            }
-            if (e.data.stdin) {
-                stdinEditor.setValue(e.data.stdin);
-            }
-            if (e.data.stdout) {
-                stdoutEditor.setValue(e.data.stdout);
-            }
-            if (e.data.compiler_options) {
-                $compilerOptions.val(e.data.compiler_options);
-            }
-            if (e.data.command_line_arguments) {
-                $commandLineArguments.val(e.data.command_line_arguments);
-            }
-            if (e.data.api_key) {
-                AUTH_HEADERS["Authorization"] = `Bearer ${e.data.api_key}`;
-            }
-        } else if (e.data.action === "run") {
-            run();
-        }
-    };
+document.addEventListener("DOMContentLoaded", async () => {
+    loadAppearance();
+    cacheElements();
+    setReviewButtonVisible(false);
+    updateAppearanceControls();
+    createEditors();
+    applyAppearance();
+    bindEvents();
+    await loadLanguages();
+    $("#stress-preset-select").dropdown();
+    generateStressPreset(elements.stressPresetSelect.value || "random");
+    setStatus("Ready");
 });
 
-const DEFAULT_SOURCE = "\
-#include <algorithm>\n\
-#include <cstdint>\n\
-#include <iostream>\n\
-#include <limits>\n\
-#include <set>\n\
-#include <utility>\n\
-#include <vector>\n\
-\n\
-using Vertex    = std::uint16_t;\n\
-using Cost      = std::uint16_t;\n\
-using Edge      = std::pair< Vertex, Cost >;\n\
-using Graph     = std::vector< std::vector< Edge > >;\n\
-using CostTable = std::vector< std::uint64_t >;\n\
-\n\
-constexpr auto kInfiniteCost{ std::numeric_limits< CostTable::value_type >::max() };\n\
-\n\
-auto dijkstra( Vertex const start, Vertex const end, Graph const & graph, CostTable & costTable )\n\
-{\n\
-    std::fill( costTable.begin(), costTable.end(), kInfiniteCost );\n\
-    costTable[ start ] = 0;\n\
-\n\
-    std::set< std::pair< CostTable::value_type, Vertex > > minHeap;\n\
-    minHeap.emplace( 0, start );\n\
-\n\
-    while ( !minHeap.empty() )\n\
-    {\n\
-        auto const vertexCost{ minHeap.begin()->first  };\n\
-        auto const vertex    { minHeap.begin()->second };\n\
-\n\
-        minHeap.erase( minHeap.begin() );\n\
-\n\
-        if ( vertex == end )\n\
-        {\n\
-            break;\n\
-        }\n\
-\n\
-        for ( auto const & neighbourEdge : graph[ vertex ] )\n\
-        {\n\
-            auto const & neighbour{ neighbourEdge.first };\n\
-            auto const & cost{ neighbourEdge.second };\n\
-\n\
-            if ( costTable[ neighbour ] > vertexCost + cost )\n\
-            {\n\
-                minHeap.erase( { costTable[ neighbour ], neighbour } );\n\
-                costTable[ neighbour ] = vertexCost + cost;\n\
-                minHeap.emplace( costTable[ neighbour ], neighbour );\n\
-            }\n\
-        }\n\
-    }\n\
-\n\
-    return costTable[ end ];\n\
-}\n\
-\n\
-int main()\n\
-{\n\
-    constexpr std::uint16_t maxVertices{ 10000 };\n\
-\n\
-    Graph     graph    ( maxVertices );\n\
-    CostTable costTable( maxVertices );\n\
-\n\
-    std::uint16_t testCases;\n\
-    std::cin >> testCases;\n\
-\n\
-    while ( testCases-- > 0 )\n\
-    {\n\
-        for ( auto i{ 0 }; i < maxVertices; ++i )\n\
-        {\n\
-            graph[ i ].clear();\n\
-        }\n\
-\n\
-        std::uint16_t numberOfVertices;\n\
-        std::uint16_t numberOfEdges;\n\
-\n\
-        std::cin >> numberOfVertices >> numberOfEdges;\n\
-\n\
-        for ( auto i{ 0 }; i < numberOfEdges; ++i )\n\
-        {\n\
-            Vertex from;\n\
-            Vertex to;\n\
-            Cost   cost;\n\
-\n\
-            std::cin >> from >> to >> cost;\n\
-            graph[ from ].emplace_back( to, cost );\n\
-        }\n\
-\n\
-        Vertex start;\n\
-        Vertex end;\n\
-\n\
-        std::cin >> start >> end;\n\
-\n\
-        auto const result{ dijkstra( start, end, graph, costTable ) };\n\
-\n\
-        if ( result == kInfiniteCost )\n\
-        {\n\
-            std::cout << \"NO\\n\";\n\
-        }\n\
-        else\n\
-        {\n\
-            std::cout << result << '\\n';\n\
-        }\n\
-    }\n\
-\n\
-    return 0;\n\
-}\n\
-";
+const DEFAULT_SOURCE = `#include <bits/stdc++.h>
+using namespace std;
 
-const DEFAULT_STDIN = "\
-3\n\
-3 2\n\
-1 2 5\n\
-2 3 7\n\
-1 3\n\
-3 3\n\
-1 2 4\n\
-1 3 7\n\
-2 3 1\n\
-1 3\n\
-3 1\n\
-1 2 4\n\
-1 3\n\
-";
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-const DEFAULT_COMPILER_OPTIONS = "";
-const DEFAULT_CMD_ARGUMENTS = "";
-const DEFAULT_LANGUAGE_ID = 105; // C++ (GCC 14.1.0) (https://ce.judge0.com/languages/105)
+    int n;
+    cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; ++i) cin >> a[i];
 
-function getEditorLanguageMode(languageName) {
-    const DEFAULT_EDITOR_LANGUAGE_MODE = "plaintext";
-    const LANGUAGE_NAME_TO_LANGUAGE_EDITOR_MODE = {
-        "Bash": "shell",
-        "C": "c",
-        "C3": "c",
-        "C#": "csharp",
-        "C++": "cpp",
-        "Clojure": "clojure",
-        "F#": "fsharp",
-        "Go": "go",
-        "Java": "java",
-        "JavaScript": "javascript",
-        "Kotlin": "kotlin",
-        "Objective-C": "objective-c",
-        "Pascal": "pascal",
-        "Perl": "perl",
-        "PHP": "php",
-        "Python": "python",
-        "R": "r",
-        "Ruby": "ruby",
-        "SQL": "sql",
-        "Swift": "swift",
-        "TypeScript": "typescript",
-        "Visual Basic": "vb"
-    }
+    long long sum = 0;
+    for (long long x : a) sum += x;
 
-    for (let key in LANGUAGE_NAME_TO_LANGUAGE_EDITOR_MODE) {
-        if (languageName.toLowerCase().startsWith(key.toLowerCase())) {
-            return LANGUAGE_NAME_TO_LANGUAGE_EDITOR_MODE[key];
-        }
-    }
-    return DEFAULT_EDITOR_LANGUAGE_MODE;
+    cout << sum << "\\n";
+    return 0;
 }
+`;
 
-const EXTENSIONS_TABLE = {
-    "asm": { "flavor": CE, "language_id": 45 }, // Assembly (NASM 2.14.02)
-    "c": { "flavor": CE, "language_id": 103 }, // C (GCC 14.1.0)
-    "cpp": { "flavor": CE, "language_id": 105 }, // C++ (GCC 14.1.0)
-    "cs": { "flavor": EXTRA_CE, "language_id": 29 }, // C# (.NET Core SDK 7.0.400)
-    "go": { "flavor": CE, "language_id": 95 }, // Go (1.18.5)
-    "java": { "flavor": CE, "language_id": 91 }, // Java (JDK 17.0.6)
-    "js": { "flavor": CE, "language_id": 102 }, // JavaScript (Node.js 22.08.0)
-    "lua": { "flavor": CE, "language_id": 64 }, // Lua (5.3.5)
-    "pas": { "flavor": CE, "language_id": 67 }, // Pascal (FPC 3.0.4)
-    "php": { "flavor": CE, "language_id": 98 }, // PHP (8.3.11)
-    "py": { "flavor": EXTRA_CE, "language_id": 25 }, // Python for ML (3.11.2)
-    "r": { "flavor": CE, "language_id": 99 }, // R (4.4.1)
-    "rb": { "flavor": CE, "language_id": 72 }, // Ruby (2.7.0)
-    "rs": { "flavor": CE, "language_id": 73 }, // Rust (1.40.0)
-    "scala": { "flavor": CE, "language_id": 81 }, // Scala (2.13.2)
-    "sh": { "flavor": CE, "language_id": 46 }, // Bash (5.0.0)
-    "swift": { "flavor": CE, "language_id": 83 }, // Swift (5.2.3)
-    "ts": { "flavor": CE, "language_id": 101 }, // TypeScript (5.6.2)
-    "txt": { "flavor": CE, "language_id": 43 }, // Plain Text
-};
-
-function getLanguageForExtension(extension) {
-    return EXTENSIONS_TABLE[extension] || { "flavor": CE, "language_id": 43 }; // Plain Text (https://ce.judge0.com/languages/43)
-}
+const DEFAULT_STDIN = `5
+1 2 3 4 5
+`;

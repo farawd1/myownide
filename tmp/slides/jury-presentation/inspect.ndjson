@@ -1,0 +1,157 @@
+{"kind":"deck","id":"jury-presentation","slideCount":6,"slideSize":{"width":1280,"height":720}}
+{"kind":"slide","slide":1,"id":"as0qzl"}
+{"kind":"slide","slide":2,"id":"v6i742"}
+{"kind":"slide","slide":3,"id":"vn9ixn"}
+{"kind":"slide","slide":4,"id":"1de8hf"}
+{"kind":"slide","slide":5,"id":"hnj8bf"}
+{"kind":"slide","slide":6,"id":"zg5ohp"}
+{"kind":"image","slide":1,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-01.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":1,"id":"3","role":"cover contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":1,"id":"4","role":"cover accent rule","shapeType":"rect","bbox":[64,86,7,455]}
+{"kind":"textbox","slide":1,"id":"5","role":"kicker","text":"ПРЕЗЕНТАЦИЯ ПРОЕКТА","textPreview":"ПРЕЗЕНТАЦИЯ ПРОЕКТА","textChars":19,"textLines":1,"bbox":[86,88,520,26]}
+{"kind":"textbox","slide":1,"id":"6","role":"cover title","text":"MyOwnIDE","textPreview":"MyOwnIDE","textChars":8,"textLines":1,"bbox":[82,130,785,184]}
+{"kind":"textbox","slide":1,"id":"7","role":"cover subtitle","text":"Браузерная IDE для быстрого запуска кода, анализа асимптотики и стресс-тестов.","textPreview":"Браузерная IDE для быстрого запуска кода, анализа асимптотики и стресс-тестов.","textChars":78,"textLines":1,"bbox":[86,326,610,86]}
+{"kind":"shape","slide":1,"id":"8","role":"cover moment panel","shapeType":"roundRect","bbox":[86,456,390,92]}
+{"kind":"textbox","slide":1,"id":"9","role":"cover moment","text":"Один браузерный инструмент для написания, проверки и валидации решений.","textPreview":"Один браузерный инструмент для написания, проверки и валидации решений.","textChars":71,"textLines":1,"bbox":[112,478,336,40]}
+{"kind":"image","slide":2,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-02.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":2,"id":"3","role":"content contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"textbox","slide":2,"id":"4","role":"header","text":"ПОЧЕМУ ЭТО ВАЖНО","textPreview":"ПОЧЕМУ ЭТО ВАЖНО","textChars":16,"textLines":1,"bbox":[64,34,430,24]}
+{"kind":"textbox","slide":2,"id":"5","role":"header","text":"02 / 06","textPreview":"02 / 06","textChars":7,"textLines":1,"bbox":[1114,34,104,24]}
+{"kind":"shape","slide":2,"id":"6","role":"header rule","shapeType":"rect","bbox":[64,64,1152,2]}
+{"kind":"shape","slide":2,"id":"7","role":"header marker","shapeType":"ellipse","bbox":[57,57,16,16]}
+{"kind":"textbox","slide":2,"id":"8","role":"title","text":"Какую проблему решает проект?","textPreview":"Какую проблему решает проект?","textChars":29,"textLines":1,"bbox":[64,86,760,142]}
+{"kind":"textbox","slide":2,"id":"9","role":"subtitle","text":"Для олимпиадного программирования и обучения нужен более быстрый и удобный цикл обратной связи, чем у обычного онлайн-компилятора.","textPreview":"Для олимпиадного программирования и обучения нужен более быстрый и удобный цикл обратной связи, чем у обычного онлайн-компилятора.","textChars":130,"textLines":1,"bbox":[66,234,720,70]}
+{"kind":"shape","slide":2,"id":"10","role":"card panel: Разрозненный процесс","shapeType":"roundRect","bbox":[84,426,355.3333333333333,176]}
+{"kind":"shape","slide":2,"id":"11","role":"card accent: Разрозненный процесс","shapeType":"rect","bbox":[84,426,8,176]}
+{"kind":"shape","slide":2,"id":"12","role":"icon badge","shapeType":"ellipse","bbox":[106,450,54,54]}
+{"kind":"shape","slide":2,"id":"13","role":"icon glyph","shapeType":"rect","bbox":[122,479,6,12]}
+{"kind":"shape","slide":2,"id":"14","role":"icon glyph","shapeType":"rect","bbox":[131,471,6,20]}
+{"kind":"shape","slide":2,"id":"15","role":"icon glyph","shapeType":"rect","bbox":[140,464,6,27]}
+{"kind":"textbox","slide":2,"id":"16","role":"card label","text":"Разрозненный процесс","textPreview":"Разрозненный процесс","textChars":20,"textLines":1,"bbox":[172,448,247.33333333333331,28]}
+{"kind":"textbox","slide":2,"id":"17","role":"card body: Разрозненный процесс","text":"Пользователь переключается\nмежду компилятором,\nзаметками, сложностью и\nручными тестами.","textPreview":"Пользователь переключается | между компилятором, | заметками, сложностью и | ручными тестами.","textChars":87,"textLines":4,"bbox":[108,512,307.3333333333333,68]}
+{"kind":"shape","slide":2,"id":"18","role":"card panel: Слабая проверка","shapeType":"roundRect","bbox":[463.3333333333333,426,355.3333333333333,176]}
+{"kind":"shape","slide":2,"id":"19","role":"card accent: Слабая проверка","shapeType":"rect","bbox":[463.3333333333333,426,8,176]}
+{"kind":"shape","slide":2,"id":"20","role":"icon badge","shapeType":"ellipse","bbox":[485.3333333333333,450,54,54]}
+{"kind":"shape","slide":2,"id":"21","role":"icon glyph","shapeType":"ellipse","bbox":[498.3333333333333,468,10,10]}
+{"kind":"shape","slide":2,"id":"22","role":"icon glyph","shapeType":"ellipse","bbox":[516.3333333333333,477,10,10]}
+{"kind":"shape","slide":2,"id":"23","role":"icon glyph","shapeType":"rect","bbox":[507.3333333333333,475,19,3]}
+{"kind":"textbox","slide":2,"id":"24","role":"card label","text":"Слабая проверка","textPreview":"Слабая проверка","textChars":15,"textLines":1,"bbox":[551.3333333333333,448,247.33333333333331,28]}
+{"kind":"textbox","slide":2,"id":"25","role":"card body: Слабая проверка","text":"Решение может пройти пример,\nно упасть на пустом массиве,\nдубликатах или отрицательных\nчислах.","textPreview":"Решение может пройти пример, | но упасть на пустом массиве, | дубликатах или отрицательных | числах.","textChars":94,"textLines":4,"bbox":[487.3333333333333,512,307.3333333333333,68]}
+{"kind":"shape","slide":2,"id":"26","role":"card panel: Медленная итерация","shapeType":"roundRect","bbox":[842.6666666666666,426,355.3333333333333,176]}
+{"kind":"shape","slide":2,"id":"27","role":"card accent: Медленная итерация","shapeType":"rect","bbox":[842.6666666666666,426,8,176]}
+{"kind":"shape","slide":2,"id":"28","role":"icon badge","shapeType":"ellipse","bbox":[864.6666666666666,450,54,54]}
+{"kind":"shape","slide":2,"id":"29","role":"icon glyph","shapeType":"roundRect","bbox":[877.6666666666666,465,26,13]}
+{"kind":"shape","slide":2,"id":"30","role":"icon glyph","shapeType":"roundRect","bbox":[882.6666666666666,474,26,13]}
+{"kind":"shape","slide":2,"id":"31","role":"icon glyph","shapeType":"roundRect","bbox":[887.6666666666666,483,20,10]}
+{"kind":"textbox","slide":2,"id":"32","role":"card label","text":"Медленная итерация","textPreview":"Медленная итерация","textChars":18,"textLines":1,"bbox":[930.6666666666666,448,247.33333333333331,28]}
+{"kind":"textbox","slide":2,"id":"33","role":"card body: Медленная итерация","text":"При медленной обратной связи\nвремя уходит не на алгоритм,\nа на техническую отладку.","textPreview":"При медленной обратной связи | время уходит не на алгоритм, | а на техническую отладку.","textChars":83,"textLines":3,"bbox":[866.6666666666666,512,307.3333333333333,68]}
+{"kind":"image","slide":3,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-03.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":3,"id":"3","role":"metrics contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"textbox","slide":3,"id":"4","role":"header","text":"ОСНОВА ПРОДУКТА","textPreview":"ОСНОВА ПРОДУКТА","textChars":15,"textLines":1,"bbox":[64,34,430,24]}
+{"kind":"textbox","slide":3,"id":"5","role":"header","text":"03 / 06","textPreview":"03 / 06","textChars":7,"textLines":1,"bbox":[1114,34,104,24]}
+{"kind":"shape","slide":3,"id":"6","role":"header rule","shapeType":"rect","bbox":[64,64,1152,2]}
+{"kind":"shape","slide":3,"id":"7","role":"header marker","shapeType":"ellipse","bbox":[57,57,16,16]}
+{"kind":"textbox","slide":3,"id":"8","role":"title","text":"Что умеет MyOwnIDE сейчас?","textPreview":"Что умеет MyOwnIDE сейчас?","textChars":26,"textLines":1,"bbox":[64,86,700,142]}
+{"kind":"textbox","slide":3,"id":"9","role":"subtitle","text":"Текущая версия сосредоточена на трёх полезных действиях, которые реально ускоряют решение задач.","textPreview":"Текущая версия сосредоточена на трёх полезных действиях, которые реально ускоряют решение задач.","textChars":96,"textLines":1,"bbox":[66,234,700,70]}
+{"kind":"shape","slide":3,"id":"10","role":"metric panel: Запуск кода в браузере на нескольких языках","shapeType":"roundRect","bbox":[92,404,330,174]}
+{"kind":"shape","slide":3,"id":"11","role":"metric accent: Запуск кода в браузере на нескольких языках","shapeType":"rect","bbox":[92,404,330,7]}
+{"kind":"textbox","slide":3,"id":"12","role":"metric value","text":"Run","textPreview":"Run","textChars":3,"textLines":1,"bbox":[114,428,286,54]}
+{"kind":"textbox","slide":3,"id":"13","role":"metric label","text":"Запуск кода в браузере на нескольких языках","textPreview":"Запуск кода в браузере на нескольких языках","textChars":43,"textLines":1,"bbox":[116,486,282,38]}
+{"kind":"textbox","slide":3,"id":"14","role":"metric note","text":"Интеграция с Judge0","textPreview":"Интеграция с Judge0","textChars":19,"textLines":1,"bbox":[116,536,282,22]}
+{"kind":"shape","slide":3,"id":"15","role":"metric panel: Оценка асимптотики через ИИ","shapeType":"roundRect","bbox":[462,404,330,174]}
+{"kind":"shape","slide":3,"id":"16","role":"metric accent: Оценка асимптотики через ИИ","shapeType":"rect","bbox":[462,404,330,7]}
+{"kind":"textbox","slide":3,"id":"17","role":"metric value","text":"O(...)","textPreview":"O(...)","textChars":6,"textLines":1,"bbox":[484,428,286,54]}
+{"kind":"textbox","slide":3,"id":"18","role":"metric label","text":"Оценка асимптотики через ИИ","textPreview":"Оценка асимптотики через ИИ","textChars":27,"textLines":1,"bbox":[486,486,282,38]}
+{"kind":"textbox","slide":3,"id":"19","role":"metric note","text":"Анализ в один клик","textPreview":"Анализ в один клик","textChars":18,"textLines":1,"bbox":[486,536,282,22]}
+{"kind":"shape","slide":3,"id":"20","role":"metric panel: Готовые пресеты стресс-тестов для важных крайних случаев","shapeType":"roundRect","bbox":[832,404,330,174]}
+{"kind":"shape","slide":3,"id":"21","role":"metric accent: Готовые пресеты стресс-тестов для важных крайних случаев","shapeType":"rect","bbox":[832,404,330,7]}
+{"kind":"textbox","slide":3,"id":"22","role":"metric value","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[854,428,286,54]}
+{"kind":"textbox","slide":3,"id":"23","role":"metric label","text":"Готовые пресеты стресс-тестов для важных крайних случаев","textPreview":"Готовые пресеты стресс-тестов для важных крайних случаев","textChars":56,"textLines":1,"bbox":[856,486,282,38]}
+{"kind":"textbox","slide":3,"id":"24","role":"metric note","text":"Встроено прямо в интерфейс","textPreview":"Встроено прямо в интерфейс","textChars":26,"textLines":1,"bbox":[856,536,282,22]}
+{"kind":"image","slide":4,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-04.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":4,"id":"3","role":"content contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"textbox","slide":4,"id":"4","role":"header","text":"ТЕХНИЧЕСКАЯ ЧАСТЬ","textPreview":"ТЕХНИЧЕСКАЯ ЧАСТЬ","textChars":17,"textLines":1,"bbox":[64,34,430,24]}
+{"kind":"textbox","slide":4,"id":"5","role":"header","text":"04 / 06","textPreview":"04 / 06","textChars":7,"textLines":1,"bbox":[1114,34,104,24]}
+{"kind":"shape","slide":4,"id":"6","role":"header rule","shapeType":"rect","bbox":[64,64,1152,2]}
+{"kind":"shape","slide":4,"id":"7","role":"header marker","shapeType":"ellipse","bbox":[57,57,16,16]}
+{"kind":"textbox","slide":4,"id":"8","role":"title","text":"Как устроен проект внутри?","textPreview":"Как устроен проект внутри?","textChars":26,"textLines":1,"bbox":[64,86,760,142]}
+{"kind":"textbox","slide":4,"id":"9","role":"subtitle","text":"Система объединяет лёгкий фронтенд, удалённое выполнение кода и AI-сервис для анализа.","textPreview":"Система объединяет лёгкий фронтенд, удалённое выполнение кода и AI-сервис для анализа.","textChars":86,"textLines":1,"bbox":[66,234,720,70]}
+{"kind":"shape","slide":4,"id":"10","role":"card panel: Фронтенд","shapeType":"roundRect","bbox":[84,426,355.3333333333333,176]}
+{"kind":"shape","slide":4,"id":"11","role":"card accent: Фронтенд","shapeType":"rect","bbox":[84,426,8,176]}
+{"kind":"shape","slide":4,"id":"12","role":"icon badge","shapeType":"ellipse","bbox":[106,450,54,54]}
+{"kind":"shape","slide":4,"id":"13","role":"icon glyph","shapeType":"rect","bbox":[122,479,6,12]}
+{"kind":"shape","slide":4,"id":"14","role":"icon glyph","shapeType":"rect","bbox":[131,471,6,20]}
+{"kind":"shape","slide":4,"id":"15","role":"icon glyph","shapeType":"rect","bbox":[140,464,6,27]}
+{"kind":"textbox","slide":4,"id":"16","role":"card label","text":"Фронтенд","textPreview":"Фронтенд","textChars":8,"textLines":1,"bbox":[172,448,247.33333333333331,28]}
+{"kind":"textbox","slide":4,"id":"17","role":"card body: Фронтенд","text":"Интерфейс построен на Monaco\nEditor и собственной\nоболочке для быстрого цикла\nввода и вывода.","textPreview":"Интерфейс построен на Monaco | Editor и собственной | оболочке для быстрого цикла | ввода и вывода.","textChars":93,"textLines":4,"bbox":[108,512,307.3333333333333,68]}
+{"kind":"shape","slide":4,"id":"18","role":"card panel: Бэкенд","shapeType":"roundRect","bbox":[463.3333333333333,426,355.3333333333333,176]}
+{"kind":"shape","slide":4,"id":"19","role":"card accent: Бэкенд","shapeType":"rect","bbox":[463.3333333333333,426,8,176]}
+{"kind":"shape","slide":4,"id":"20","role":"icon badge","shapeType":"ellipse","bbox":[485.3333333333333,450,54,54]}
+{"kind":"shape","slide":4,"id":"21","role":"icon glyph","shapeType":"ellipse","bbox":[498.3333333333333,468,10,10]}
+{"kind":"shape","slide":4,"id":"22","role":"icon glyph","shapeType":"ellipse","bbox":[516.3333333333333,477,10,10]}
+{"kind":"shape","slide":4,"id":"23","role":"icon glyph","shapeType":"rect","bbox":[507.3333333333333,475,19,3]}
+{"kind":"textbox","slide":4,"id":"24","role":"card label","text":"Бэкенд","textPreview":"Бэкенд","textChars":6,"textLines":1,"bbox":[551.3333333333333,448,247.33333333333331,28]}
+{"kind":"textbox","slide":4,"id":"25","role":"card body: Бэкенд","text":"Node.js и Express связывают\nинтерфейс с Judge0 для\nзапуска кода и с ИИ для\nанализа асимптотики.","textPreview":"Node.js и Express связывают | интерфейс с Judge0 для | запуска кода и с ИИ для | анализа асимптотики.","textChars":95,"textLines":4,"bbox":[487.3333333333333,512,307.3333333333333,68]}
+{"kind":"shape","slide":4,"id":"26","role":"card panel: Деплой","shapeType":"roundRect","bbox":[842.6666666666666,426,355.3333333333333,176]}
+{"kind":"shape","slide":4,"id":"27","role":"card accent: Деплой","shapeType":"rect","bbox":[842.6666666666666,426,8,176]}
+{"kind":"shape","slide":4,"id":"28","role":"icon badge","shapeType":"ellipse","bbox":[864.6666666666666,450,54,54]}
+{"kind":"shape","slide":4,"id":"29","role":"icon glyph","shapeType":"roundRect","bbox":[877.6666666666666,465,26,13]}
+{"kind":"shape","slide":4,"id":"30","role":"icon glyph","shapeType":"roundRect","bbox":[882.6666666666666,474,26,13]}
+{"kind":"shape","slide":4,"id":"31","role":"icon glyph","shapeType":"roundRect","bbox":[887.6666666666666,483,20,10]}
+{"kind":"textbox","slide":4,"id":"32","role":"card label","text":"Деплой","textPreview":"Деплой","textChars":6,"textLines":1,"bbox":[930.6666666666666,448,247.33333333333331,28]}
+{"kind":"textbox","slide":4,"id":"33","role":"card body: Деплой","text":"Проект опубликован на\nsproga.xyz через Cloudflare\nTunnel и может работать даже\nс домашнего компьютера.","textPreview":"Проект опубликован на | sproga.xyz через Cloudflare | Tunnel и может работать даже | с домашнего компьютера.","textChars":102,"textLines":4,"bbox":[866.6666666666666,512,307.3333333333333,68]}
+{"kind":"image","slide":5,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-05.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":5,"id":"3","role":"content contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"textbox","slide":5,"id":"4","role":"header","text":"ЖИВАЯ ДЕМОНСТРАЦИЯ","textPreview":"ЖИВАЯ ДЕМОНСТРАЦИЯ","textChars":18,"textLines":1,"bbox":[64,34,430,24]}
+{"kind":"textbox","slide":5,"id":"5","role":"header","text":"05 / 06","textPreview":"05 / 06","textChars":7,"textLines":1,"bbox":[1114,34,104,24]}
+{"kind":"shape","slide":5,"id":"6","role":"header rule","shapeType":"rect","bbox":[64,64,1152,2]}
+{"kind":"shape","slide":5,"id":"7","role":"header marker","shapeType":"ellipse","bbox":[57,57,16,16]}
+{"kind":"textbox","slide":5,"id":"8","role":"title","text":"Что показать жюри за 60-90 секунд?","textPreview":"Что показать жюри за 60-90 секунд?","textChars":34,"textLines":1,"bbox":[64,86,760,142]}
+{"kind":"textbox","slide":5,"id":"9","role":"subtitle","text":"Короткой демонстрации достаточно, чтобы доказать практическую пользу и готовность продукта.","textPreview":"Короткой демонстрации достаточно, чтобы доказать практическую пользу и готовность продукта.","textChars":91,"textLines":1,"bbox":[66,234,720,70]}
+{"kind":"shape","slide":5,"id":"10","role":"card panel: Шаг 1","shapeType":"roundRect","bbox":[84,426,355.3333333333333,176]}
+{"kind":"shape","slide":5,"id":"11","role":"card accent: Шаг 1","shapeType":"rect","bbox":[84,426,8,176]}
+{"kind":"shape","slide":5,"id":"12","role":"icon badge","shapeType":"ellipse","bbox":[106,450,54,54]}
+{"kind":"shape","slide":5,"id":"13","role":"icon glyph","shapeType":"rect","bbox":[122,479,6,12]}
+{"kind":"shape","slide":5,"id":"14","role":"icon glyph","shapeType":"rect","bbox":[131,471,6,20]}
+{"kind":"shape","slide":5,"id":"15","role":"icon glyph","shapeType":"rect","bbox":[140,464,6,27]}
+{"kind":"textbox","slide":5,"id":"16","role":"card label","text":"Шаг 1","textPreview":"Шаг 1","textChars":5,"textLines":1,"bbox":[172,448,247.33333333333331,28]}
+{"kind":"textbox","slide":5,"id":"17","role":"card body: Шаг 1","text":"Открыть sproga.xyz и\nпоказать редактор, ввод,\nвывод, асимптотику и\nстресс-пресеты.","textPreview":"Открыть sproga.xyz и | показать редактор, ввод, | вывод, асимптотику и | стресс-пресеты.","textChars":82,"textLines":4,"bbox":[108,512,307.3333333333333,68]}
+{"kind":"shape","slide":5,"id":"18","role":"card panel: Шаг 2","shapeType":"roundRect","bbox":[463.3333333333333,426,355.3333333333333,176]}
+{"kind":"shape","slide":5,"id":"19","role":"card accent: Шаг 2","shapeType":"rect","bbox":[463.3333333333333,426,8,176]}
+{"kind":"shape","slide":5,"id":"20","role":"icon badge","shapeType":"ellipse","bbox":[485.3333333333333,450,54,54]}
+{"kind":"shape","slide":5,"id":"21","role":"icon glyph","shapeType":"ellipse","bbox":[498.3333333333333,468,10,10]}
+{"kind":"shape","slide":5,"id":"22","role":"icon glyph","shapeType":"ellipse","bbox":[516.3333333333333,477,10,10]}
+{"kind":"shape","slide":5,"id":"23","role":"icon glyph","shapeType":"rect","bbox":[507.3333333333333,475,19,3]}
+{"kind":"textbox","slide":5,"id":"24","role":"card label","text":"Шаг 2","textPreview":"Шаг 2","textChars":5,"textLines":1,"bbox":[551.3333333333333,448,247.33333333333331,28]}
+{"kind":"textbox","slide":5,"id":"25","role":"card body: Шаг 2","text":"Запустить простую задачу на\nмассив и затем нажать\nAnalyze, чтобы показать\nоценку сложности.","textPreview":"Запустить простую задачу на | массив и затем нажать | Analyze, чтобы показать | оценку сложности.","textChars":91,"textLines":4,"bbox":[487.3333333333333,512,307.3333333333333,68]}
+{"kind":"shape","slide":5,"id":"26","role":"card panel: Шаг 3","shapeType":"roundRect","bbox":[842.6666666666666,426,355.3333333333333,176]}
+{"kind":"shape","slide":5,"id":"27","role":"card accent: Шаг 3","shapeType":"rect","bbox":[842.6666666666666,426,8,176]}
+{"kind":"shape","slide":5,"id":"28","role":"icon badge","shapeType":"ellipse","bbox":[864.6666666666666,450,54,54]}
+{"kind":"shape","slide":5,"id":"29","role":"icon glyph","shapeType":"roundRect","bbox":[877.6666666666666,465,26,13]}
+{"kind":"shape","slide":5,"id":"30","role":"icon glyph","shapeType":"roundRect","bbox":[882.6666666666666,474,26,13]}
+{"kind":"shape","slide":5,"id":"31","role":"icon glyph","shapeType":"roundRect","bbox":[887.6666666666666,483,20,10]}
+{"kind":"textbox","slide":5,"id":"32","role":"card label","text":"Шаг 3","textPreview":"Шаг 3","textChars":5,"textLines":1,"bbox":[930.6666666666666,448,247.33333333333331,28]}
+{"kind":"textbox","slide":5,"id":"33","role":"card body: Шаг 3","text":"Сгенерировать крайние\nслучаи: пустой массив, нули,\nотрицательные числа, рост и\nспад.","textPreview":"Сгенерировать крайние | случаи: пустой массив, нули, | отрицательные числа, рост и | спад.","textChars":84,"textLines":4,"bbox":[866.6666666666666,512,307.3333333333333,68]}
+{"kind":"image","slide":6,"id":"2","role":"art plate","path":"C:\\Users\\batyr\\Desktop\\fam1ly\\myownide\\tmp\\slides\\jury-presentation\\references\\slide-06.png","bbox":[0,0,1280,720]}
+{"kind":"shape","slide":6,"id":"3","role":"metrics contrast overlay","shapeType":"rect","bbox":[0,0,1280,720]}
+{"kind":"textbox","slide":6,"id":"4","role":"header","text":"ЦЕННОСТЬ И РАЗВИТИЕ","textPreview":"ЦЕННОСТЬ И РАЗВИТИЕ","textChars":19,"textLines":1,"bbox":[64,34,430,24]}
+{"kind":"textbox","slide":6,"id":"5","role":"header","text":"06 / 06","textPreview":"06 / 06","textChars":7,"textLines":1,"bbox":[1114,34,104,24]}
+{"kind":"shape","slide":6,"id":"6","role":"header rule","shapeType":"rect","bbox":[64,64,1152,2]}
+{"kind":"shape","slide":6,"id":"7","role":"header marker","shapeType":"ellipse","bbox":[57,57,16,16]}
+{"kind":"textbox","slide":6,"id":"8","role":"title","text":"Почему этот проект заслуживает внимания?","textPreview":"Почему этот проект заслуживает внимания?","textChars":40,"textLines":1,"bbox":[64,86,700,142]}
+{"kind":"textbox","slide":6,"id":"9","role":"subtitle","text":"Он уже решает реальную пользовательскую задачу и имеет понятный путь дальнейшего роста.","textPreview":"Он уже решает реальную пользовательскую задачу и имеет понятный путь дальнейшего роста.","textChars":87,"textLines":1,"bbox":[66,234,700,70]}
+{"kind":"shape","slide":6,"id":"10","role":"metric panel: Один браузерный инструмент для цикла решить-проверить-отладить","shapeType":"roundRect","bbox":[92,404,330,174]}
+{"kind":"shape","slide":6,"id":"11","role":"metric accent: Один браузерный инструмент для цикла решить-проверить-отладить","shapeType":"rect","bbox":[92,404,330,7]}
+{"kind":"textbox","slide":6,"id":"12","role":"metric value","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[114,428,286,54]}
+{"kind":"textbox","slide":6,"id":"13","role":"metric label","text":"Один браузерный инструмент для цикла решить-проверить-отладить","textPreview":"Один браузерный инструмент для цикла решить-проверить-отладить","textChars":62,"textLines":1,"bbox":[116,486,282,38]}
+{"kind":"textbox","slide":6,"id":"14","role":"metric note","text":"Текущая ценность продукта","textPreview":"Текущая ценность продукта","textChars":25,"textLines":1,"bbox":[116,536,282,22]}
+{"kind":"shape","slide":6,"id":"15","role":"metric panel: Две реальные интеграции: запуск кода и ИИ-анализ","shapeType":"roundRect","bbox":[462,404,330,174]}
+{"kind":"shape","slide":6,"id":"16","role":"metric accent: Две реальные интеграции: запуск кода и ИИ-анализ","shapeType":"rect","bbox":[462,404,330,7]}
+{"kind":"textbox","slide":6,"id":"17","role":"metric value","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[484,428,286,54]}
+{"kind":"textbox","slide":6,"id":"18","role":"metric label","text":"Две реальные интеграции: запуск кода и ИИ-анализ","textPreview":"Две реальные интеграции: запуск кода и ИИ-анализ","textChars":48,"textLines":1,"bbox":[486,486,282,38]}
+{"kind":"textbox","slide":6,"id":"19","role":"metric note","text":"Техническая готовность","textPreview":"Техническая готовность","textChars":22,"textLines":1,"bbox":[486,536,282,22]}
+{"kind":"shape","slide":6,"id":"20","role":"metric panel: В будущем: более гибкие стресс-тесты, сохранение сессий и усиление соревновательного сценария","shapeType":"roundRect","bbox":[832,404,330,174]}
+{"kind":"shape","slide":6,"id":"21","role":"metric accent: В будущем: более гибкие стресс-тесты, сохранение сессий и усиление соревновательного сценария","shapeType":"rect","bbox":[832,404,330,7]}
+{"kind":"textbox","slide":6,"id":"22","role":"metric value","text":"Дальше","textPreview":"Дальше","textChars":6,"textLines":1,"bbox":[854,428,286,54]}
+{"kind":"textbox","slide":6,"id":"23","role":"metric label","text":"В будущем: более гибкие стресс-тесты, сохранение сессий и усиление соревновательного сценария","textPreview":"В будущем: более гибкие стресс-тесты, сохранение сессий и усиление соревновательного сценария","textChars":93,"textLines":1,"bbox":[856,486,282,38]}
+{"kind":"textbox","slide":6,"id":"24","role":"metric note","text":"План развития","textPreview":"План развития","textChars":13,"textLines":1,"bbox":[856,536,282,22]}

@@ -1,44 +1,44 @@
 "use strict";
 
-// Default API base URL - can be overridden via environment variables
-const DEFAULT_API_BASE_URL = 'http://localhost:3001';
+const DEFAULT_API_BASE_URL = "http://localhost:3001";
 
-// Try to get API base URL from environment or use default
-const API_BASE_URL = typeof process !== 'undefined' && process.env?.API_BASE_URL 
-    ? process.env.API_BASE_URL 
+const API_BASE_URL = typeof window !== "undefined" && window.location?.hostname
+    ? (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? DEFAULT_API_BASE_URL
+        : `${window.location.origin}`)
     : DEFAULT_API_BASE_URL;
 
+async function request(path, body) {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.output || data.error || data.details || "Request failed");
+    }
+
+    return data;
+}
+
 const aiApi = {
-    /**
-     * Send a prompt to the AI backend and get the response
-     * @param {string} prompt - The text to send to AI
-     * @param {string} language - Optional language identifier
-     * @returns {Promise<{output: string}>}
-     */
-    async sendPrompt(prompt, language = null) {
-        const response = await fetch(`${API_BASE_URL}/api/ai`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                prompt: prompt,
-                language: language
-            })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.output || 'AI request failed');
-        }
-        
-        return response.json();
+    sendPrompt(prompt, language = null) {
+        return request("/api/ai", { prompt, language });
     },
-    
-    /**
-     * Check if the backend is available
-     * @returns {Promise<boolean>}
-     */
+    sendAssistantChat(messages, context) {
+        return request("/api/assistant/chat", { messages, context });
+    },
+    runAssistantAction(action, context) {
+        return request("/api/assistant/action", { action, context });
+    },
+    getComplexity(code, language, problem) {
+        return request("/api/complexity-ai", { code, language, problem });
+    },
     async isBackendAvailable() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/health`);

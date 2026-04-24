@@ -4,16 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://js.puter.com/v2/"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.6/marked.min.js" integrity="sha512-rvRITpPeEKe4hV9M8XntuXX6nuohzqdR5O3W6nhjTLwkrx0ZgBQuaK4fv5DdOWzs2IaXsGt5h0+nyp9pEuoTXg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" integrity="sha512-Ll+TuDvrWDNNRnFFIM8dOiw7Go7dsHyxRp4RutiIFW/wm3DgDmCnRZow6AqbXnCbpWu93yM1O34q+4ggzGeXVA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script>
         var require = {
             paths: {
@@ -21,98 +12,166 @@
             }
         };
     </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/goldenlayout.min.js" integrity="sha256-NhJAZDfGgv4PiB+GVlSrPdh3uc75XXYSM4su8hgTchI=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-base.css" integrity="sha512-rGtzJyDE8egZ/OScuBNLW1EIhRydcfrZo14oTvZwRLzEZu+s8foCtwi0XhXsKnhuoQAwJ7POFARWdU4fBL7FbQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link id="judge0-golden-layout-dark-theme-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-dark-theme.css" integrity="sha512-XfcBrEH69BhsZ0XpvPyzOLgikhAvIG6Znbi6yKi1Jh1iYaOXSXvljWFerhcUl5LYLCuV61KhfCydQ1+MNxnilg==" crossorigin="anonymous" referrerpolicy="no-referrer" disabled>
-    <link id="judge0-golden-layout-light-theme-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-light-theme.css" integrity="sha512-/S3N+v8cRHW2GJvM3v9FGHAKOhNgws+V1dYZb1fBxRd9XIwpqZFZB0jug+2HHf64eURsJLqVzCVn92pQTFHHow==" crossorigin="anonymous" referrerpolicy="no-referrer">
-
     <script src="./vendor/monaco-editor-0.44.0/min/vs/loader.js"></script>
     <script src="./vendor/monaco-editor-0.44.0/min/vs/editor/editor.main.nls.js"></script>
     <script src="./vendor/monaco-editor-0.44.0/min/vs/editor/editor.main.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js" integrity="sha512-Xo0Jh8MsOn72LGV8kU5LsclG7SUzJsWGhXbWcYs2MAmChkQzwiW/yTQwdJ8w6UA9C6EVG18GHb/TrYpYCjyAQw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script type="module" src="js/ai.js"></script>
-    <script type="module" src="js/configuration.js"></script>
-    <script type="module" src="js/electron.js"></script>
     <script type="module" src="js/ide.js"></script>
-    <script type="module" src="js/local_storage.js"></script>
-    <script type="module" src="js/puter.js"></script>
-    <script type="module" src="js/query.js"></script>
-    <script type="module" src="js/style.js"></script>
-    <script type="module" src="js/theme.js"></script>
 
     <link type="text/css" rel="stylesheet" href="css/ide.css">
     <link type="text/css" rel="stylesheet" href="css/semantic.css">
     <link type="text/css" rel="stylesheet" href="css/site.css">
 
-    <title>Online Compiler</title>
-    <meta name="title" content="Online Compiler">
-    <meta name="description" content="Free and open-source online code editor and compiler">
-    <meta name="author" content="Judge0 d.o.o.">
-    <meta name="keywords" content="online editor, online code editor, online ide, online compiler, online interpreter, run code online, learn programming online,
-    online debugger, programming in browser, online code runner, online code execution, debug online, debug C code online, debug C++ code online,
-    programming online, snippet, snippets, code snippet, code snippets, pastebin, execute code, programming in browser, run c online, run C++ online,
-    run java online, run python online, run ruby online, run c# online, run rust online, run pascal online, run basic online">
-
-    <meta property="og:url" content="https://ide.judge0.com">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Judge0 IDE">
-    <meta property="og:image" content="https://raw.githubusercontent.com/judge0/ide/refs/heads/master/.github/wallpaper.png">
-    <meta property="og:image:alt" content="Judge0 IDE">
-    <meta property="og:description" content="Free and open-source online code editor and compiler">
-    <meta property="og:site_name" content="Judge0 IDE">
-    <meta property="og:locale" content="en_US">
-
-    <meta property="twitter:url" content="https://ide.judge0.com">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Judge0 IDE">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/judge0/ide/refs/heads/master/.github/wallpaper.png">
-    <meta property="twitter:description" content="Free and open-source online code editor and compiler">
-
-    <link rel="shortcut icon" href="/favicons/favicon.ico">
-
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/favicon-180x180.png">
-    <meta name="apple-mobile-web-app-title" content="Judge0 IDE">
-
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="theme-color" content="#ffffff">
+    <title>MyOwnIDE</title>
+    <meta name="theme-color" content="#111827">
 </head>
-
 <body>
-    <div id="judge0-site-navigation" class="ui top fixed borderless menu judge0-showNavigation">
-        <div class="item judge0-showSelectLanguage">
+    <div id="topbar">
+        <div class="topbar-left">
+            <div class="brand">MyOwnIDE</div>
             <select id="select-language" class="ui search selection dropdown"></select>
         </div>
-        <div class="item judge0-showRunButton">
-            <button id="run-btn" class="ui primary button" data-content="Ctrl+Enter">
-                <i class="play icon"></i>Run
-            </button>
-        </div>
-        <div class="item">
-            <button id="complexity-btn" class="ui button" data-content="Ctrl+Shift+C">
-                <i class="chart line icon"></i>Complexity
-            </button>
-        </div>
-        <div class="right menu">
-            <div class="item">
-                <span class="ui mini text" style="color: #888;">Alt+I for AI</span>
-            </div>
+
+        <div class="topbar-right">
+            <button id="appearance-btn" class="ui button">Appearance</button>
+            <button id="open-file-btn" class="ui button">Open</button>
+            <button id="save-btn" class="ui button">Save</button>
+            <button id="run-btn" class="ui primary button">Run Code</button>
         </div>
     </div>
 
-    <div id="judge0-site-content"></div>
+    <div id="app-shell">
+        <section class="editor-panel panel">
+            <div class="panel-header">
+                <div class="panel-title">Editor</div>
+                <div id="status-line" class="status-line">Ready</div>
+            </div>
+            <div id="source-editor" class="editor-host"></div>
+        </section>
+
+        <aside class="side-panel">
+            <section class="panel io-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Custom Input</div>
+                </div>
+                <div id="stdin-editor" class="editor-host side-editor"></div>
+            </section>
+
+            <section class="panel io-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Output</div>
+                    <button id="review-code-btn" class="ui button mini" hidden disabled>Review Code</button>
+                </div>
+                <div id="stdout-editor" class="editor-host side-editor"></div>
+            </section>
+        </aside>
+    </div>
+
+    <div id="bottom-tools">
+        <section class="panel tool-card">
+            <div class="panel-header">
+                <div class="panel-title">Asymptotic Complexity</div>
+                <button id="complexity-btn" class="ui button mini">Analyze</button>
+            </div>
+            <div class="tool-content">
+                <div id="complexity-result" class="complexity-result">Not analyzed yet.</div>
+            </div>
+        </section>
+
+        <section class="panel tool-card stress-card">
+            <div class="panel-header">
+                <div class="panel-title">Stress Tests</div>
+                <button id="run-stress-btn" class="ui button mini">Run Current Input</button>
+            </div>
+            <div class="tool-content">
+                <div class="stress-controls">
+                    <label class="field">
+                        <span>Preset</span>
+                        <select id="stress-preset-select" class="ui selection dropdown">
+                            <option value="random">Random</option>
+                            <option value="empty">Empty Array</option>
+                            <option value="zeros">All Zeros</option>
+                            <option value="negative">All Negative</option>
+                            <option value="increasing">Increasing</option>
+                            <option value="decreasing">Decreasing</option>
+                            <option value="constant">Constant</option>
+                            <option value="alternating">Alternating</option>
+                            <option value="duplicates">Many Duplicates</option>
+                            <option value="single">Single Element</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>Array Size</span>
+                        <input id="stress-size" type="number" min="0" max="1000" value="5">
+                    </label>
+                    <label class="field">
+                        <span>Min Value</span>
+                        <input id="stress-min" type="number" value="-5">
+                    </label>
+                    <label class="field">
+                        <span>Max Value</span>
+                        <input id="stress-max" type="number" value="5">
+                    </label>
+                </div>
+
+                <div class="stress-actions">
+                    <button id="generate-stress-btn" class="ui button tiny">Generate</button>
+                    <button id="replace-input-btn" class="ui button tiny">Replace Input</button>
+                    <button id="append-input-btn" class="ui button tiny">Append Input</button>
+                </div>
+
+                <pre id="stress-preview" class="stress-preview">No stress case generated yet.</pre>
+            </div>
+        </section>
+    </div>
+
+    <input id="open-file-input" type="file" class="hidden-input">
+
+    <div id="appearance-panel" class="appearance-panel hidden-panel">
+        <div class="appearance-card">
+            <div class="panel-header">
+                <div class="panel-title">Appearance</div>
+                <button id="close-appearance-btn" class="ui button mini">Close</button>
+            </div>
+            <div class="appearance-grid">
+                <label class="field">
+                    <span>Theme</span>
+                    <select id="theme-select">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Accent Color</span>
+                    <input id="accent-color" type="color" value="#f59e0b">
+                </label>
+
+                <label class="field">
+                    <span>Editor Font Size</span>
+                    <input id="font-size" type="range" min="12" max="22" value="14">
+                    <small id="font-size-value">14px</small>
+                </label>
+
+                <label class="field">
+                    <span>Editor Font</span>
+                    <select id="font-family">
+                        <option value="JetBrains Mono">JetBrains Mono</option>
+                        <option value="Consolas">Consolas</option>
+                        <option value="Fira Code">Fira Code</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </div>
 
     <div id="judge0-site-modal" class="ui modal">
         <div class="header">
@@ -120,25 +179,11 @@
         </div>
         <div class="scrolling content"></div>
         <div class="actions">
-            <a id="report-problem-btn" class="ui labeled icon red button" href="https://github.com/judge0/ide/issues/new?title=New+bug+report&body=Describe+the+problem." target="_blank">
-                <i class="flag icon"></i>
-                Report Problem
-            </a>
             <div class="ui labeled icon cancel secondary button">
                 <i class="close icon"></i>
-                Close (ESC)
+                Close
             </div>
         </div>
     </div>
-
-    <div id="judge0-status-line" class="ui bottom right attached mini label judge0-showStatusLine"></div>
-
-    <a href="https://judge0.com" target="_blank" class="ui bottom center attached mini label judge0-showCopyright">© 2016-2026 Judge0 d.o.o. – All Rights Reserved. • A Croatian 🇭🇷 company</a>
-
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("sw.js").then(() => console.log("Service Worker Registered"));
-        }
-    </script>
 </body>
 </html>
